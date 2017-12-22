@@ -1,8 +1,34 @@
-<html>
-<head>
-    <title>blog.mcguirev10.com</title>
-</head>
+---
+title: "Software development and other subjects that interest me."
+---
+
+<!DOCTYPE html>
+<html lang="en">
+  {% include head.html %}
 <body>
-    <strong>HELLO THAR!!1!</strong>
+    {% include header.html %}
+    <div class="container" itemscope itemtype="https://schema.org/Blog">
+        <div class="row">
+            <div class="twelve columns">
+
+                {% for post in paginator.posts %}
+                <article itemscope itemtype="https://schema.org/BlogPosting">
+                    <h1><a href="{{ post.url }}"><span itemprop="name">{{ post.title }}</span></a></h1>
+                    <time itemprop="datePublished" datetime="{{ post.date | date_to_xmlschema }}"><em>{{ post.date | date_to_long_string }}</em></time>
+                    <div itemprop="description">
+                        {{ post.excerpt }}
+                    </div>
+                    <a class="button" href="{{ post.url }}" itemprop="url">Read full article</a>
+                </article>
+                <hr>
+                {% endfor %}
+
+            </div>
+        </div>
+    </div>
+
+    {% include footer.html %}
+
+    {% include disqus.html %}
 </body>
 </html>

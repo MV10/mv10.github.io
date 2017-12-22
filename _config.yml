@@ -1,0 +1,11 @@
+theme: jekyll-theme-midnight
+gems:
+  - jekyll-sitemap
+  - jekyll-paginate
+  - jekyll-gist
+  - jekyll-feed
+timezone: America/New_York
+future: true
+paginate: 50
+excerpt_separator: <!--more-->
+url: https://blog.mcguirev10.com

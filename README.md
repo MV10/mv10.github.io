@@ -1,1 +1,1 @@
-# blog.mcguirev10.com
+# [blog.mcguirev10.com](https://blog.mcguirev10.com/)
