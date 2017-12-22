@@ -1,5 +1,6 @@
 ---
 layout: default
+comments: true
 title: TITLE
 tags: personal c# .net azure ai odm java unity
 ---
