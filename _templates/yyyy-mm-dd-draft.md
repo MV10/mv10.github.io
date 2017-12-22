@@ -12,6 +12,6 @@ tags: personal c# .net azure ai odm java unity
 
 ### Subheading
 
-{% highlight csharp linenos %}
+{% highlight csharp linenos %}{% raw %}
 include System;
-{% endhighlight %}
+{% endraw %}{% endhighlight %}
