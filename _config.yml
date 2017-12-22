@@ -9,3 +9,5 @@ future: true
 paginate: 50
 excerpt_separator: <!--more-->
 url: https://blog.mcguirev10.com
+title: McGuireV10's blog
+description: Software development and other topics of interest.
