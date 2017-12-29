@@ -22,7 +22,7 @@ So what's this "mcguirev10" thing all about? For nearly 20 years, it has (mostly
 
 Anyway, as I mentioned, this post is really a test for sorting out the templates and styles and other browser-mandated arcana, but since I'm making all this noise about code, here's some 8086 assembly to spice things up before we leave.
 
-{% highlight nasm linenos %}{% raw %}
+```nasm
 DATA SEGMENT
      MSG DB "hello, world$"
 ENDS
@@ -38,4 +38,4 @@ START:
       INT 21H      
 END START
 ENDS
-{% endraw %}{% endhighlight %}
+```

@@ -112,7 +112,7 @@ Next, add a new C# project to the solution. Choose "Class Library (.NET Standard
 
 ![add project](/assets/2017/12-23/netstandard.png)
 
-{% highlight xml linenos %}{% raw %}
+```xml
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
@@ -120,7 +120,7 @@ Next, add a new C# project to the solution. Choose "Class Library (.NET Standard
   </PropertyGroup>
 
 </Project>
-{% endraw %}{% endhighlight %}
+```
 
 Just two Azure packages must be added to your project from NuGet:
 
@@ -133,7 +133,7 @@ Just two Azure packages must be added to your project from NuGet:
 
 Within the KeyVault project, create a new class named KeyVaultCache:
 
-{% highlight csharp linenos %}{% raw %}
+```csharp
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.Azure.KeyVault;
@@ -171,7 +171,7 @@ namespace mv10_azure_library.KeyVault
         }
     }
 }
-{% endraw %}{% endhighlight %}
+```
 
 As mentioned earlier, the possibility of Key vault resource exhaustion means it's a good idea to cache both our connection and any secrets we retrieve. This class uses a singleton pattern on a `KeyVaultClient` object, which represents the collection, and a `Dictionary` of string key-value pairs to represent retrieved secrets and their values.
 
@@ -219,7 +219,7 @@ First, we add a reference to our new library assembly, and then we need one Azur
 
 The code is shown below. You can see the one-line call to our helper function on line 25: `await GetSecret.StorageConnectionString()` ... secure configuration-secret sharing doesn't get much easier than that!
 
-{% highlight csharp linenos %}{% raw %}
+```csharp
 using System;
 using System.Net;
 using System.Net.Http;
@@ -265,11 +265,11 @@ namespace mv10_functions
         }
     }
 }
-{% endraw %}{% endhighlight %}
+```
 
 Similarly, the LogUploadedFile Function begins with a one-liner call to retrieve the SQL connection string on line 17. This also is not production-quality code, but it does illustrate the use of our new helper libraries.
 
-{% highlight csharp linenos %}{% raw %}
+```csharp
 using System;
 using System.IO;
 using System.Threading.Tasks;
@@ -296,7 +296,7 @@ namespace mv10_functions
         }
     }
 }
-{% endraw %}{% endhighlight %}
+```
 
 In theory, you should be able to build and publish these Functions back into Azure, but something about the deployment packaging process seems to have a problem at the moment -- any dependencies of the library project will not get published. Fortunately, there is an easy work-around. Open the library csproj and find the `<PackageReference>` entries and copy them to the Functions csproj (removing any duplicates). Now the project will build with all dependencies.
 
