@@ -9,8 +9,8 @@ future: true
 paginate: 50
 excerpt_separator: <!--more-->
 url: https://blog.mcguirev10.com
-title: Jon McGuire
-description: Forty Years of Coding
+title: "Jon McGuire"
+description: "Forty Years of Coding"
 
 
 # Everthing below forces line-numbering in code blocks per > https://github.com/jekyll/jekyll/issues/4619#issuecomment-191267346
@@ -31,7 +31,7 @@ kramdown:
   # span, block element options fall back to global
   syntax_highlighter_opts:
     # Rouge Options › https://github.com/jneen/rouge#full-options
-    css_class: 'highlight'
+    css_class: "highlight"
     #line_numbers: true -- bad idea, spans don't need linenos and would inherit this option
     span:
       line_numbers: false
