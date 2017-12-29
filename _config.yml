@@ -23,7 +23,8 @@ markdown: kramdown
 kramdown:
   syntax_highlighter: rouge
   syntax_highlighter_opts:
-    css_class: highlight
+    default_lang: csharp
+    css_class: 'highlight'
     span:
       line_numbers: false
     block:
