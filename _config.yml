@@ -13,14 +13,15 @@ title: Jon McGuire
 description: Forty Years of Coding
 # everything below forces line-numbering in code blocks per > https://github.com/jekyll/jekyll/issues/4619#issuecomment-191267346
 markdown: kramdown
-  highlighter: rouge
+#  highlighter: rouge
 kramdown:
   syntax_highlighter: rouge
   syntax_highlighter_opts:
     default_lang: csharp
-    css_class: 'highlight'
-    span:
-      line_numbers: false
-    block:
-      line_numbers: true
-      start_line: 1
+#    css_class: 'highlight'
+#    span:
+#      line_numbers: false
+#    block:
+#      line_numbers: true
+#      start_line: 1
+#
