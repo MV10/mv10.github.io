@@ -133,7 +133,7 @@ Just two Azure packages must be added to your project from NuGet:
 
 Within the KeyVault project, create a new class named KeyVaultCache:
 
-```csharp
+```
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.Azure.KeyVault;
