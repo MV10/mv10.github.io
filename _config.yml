@@ -11,17 +11,9 @@ excerpt_separator: <!--more-->
 url: https://blog.mcguirev10.com
 title: Jon McGuire
 description: Forty Years of Coding
-
 # everything below forces line-numbering in code blocks per > https://github.com/jekyll/jekyll/issues/4619#issuecomment-191267346
-# github-pages mandatory › https://help.github.com/articles/configuring-jekyll/#configuration-settings-you-cannot-change
-# kramdown quickref › http://kramdown.gettalong.org/quickref.html
-# kramdown options › http://kramdown.gettalong.org/options.html
-# rouge highlighter in kramdown › http://kramdown.gettalong.org/syntax_highlighter/rouge.html
-# rouge options › https://github.com/jneen/rouge#full-options
-
 #markdown: kramdown
 #  highlighter: rouge
-
 #kramdown:
 #  syntax_highlighter: rouge
 #  syntax_highlighter_opts:
