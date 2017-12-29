@@ -19,7 +19,6 @@ markdown: kramdown
 # More › http://kramdown.gettalong.org/quickref.html
 # Options › http://kramdown.gettalong.org/options.html
 kramdown:
-  input: GFM
   # Rouge Highlighter in Kramdown › http://kramdown.gettalong.org/syntax_highlighter/rouge.html
   syntax_highlighter_opts:
     # Rouge Options › https://github.com/jneen/rouge#full-options
