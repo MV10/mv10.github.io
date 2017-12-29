@@ -20,10 +20,14 @@ description: "Forty Years of Coding"
 # rouge options › https://github.com/jneen/rouge#full-options
 
 markdown: kramdown
+  highlighter: rouge
+
 kramdown:
+  input: GFM
   syntax_highlighter: rouge
   syntax_highlighter_opts:
     default_lang: csharp
+    css_class: 'highlighter'
     span:
       line_numbers: false
     block:
