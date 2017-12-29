@@ -183,7 +183,7 @@ Consumers of this class need only call `await GetCachedSecret(secretName)` to re
 
 Rather than having to remember the different names associated with the project's configuration secrets, I find it useful to create a simple helper class with methods dedicated to each secret:
 
-{% highlight csharp linenos %}{% raw %}
+```csharp
 using System.Threading.Tasks;
 
 namespace mv10_azure_library.KeyVault
@@ -194,7 +194,7 @@ namespace mv10_azure_library.KeyVault
         public static async Task<string> StorageConnectionString() => await KeyVaultCache.GetCachedSecret("storage-connection-string");
     }
 }
-{% endraw %}{% endhighlight %}
+```
 
 Now a consumer can retrieve the secret SQL connection string merely by calling `await GetSecret.SqlConnectionString()`.
 
@@ -312,7 +312,7 @@ Even though we've already covered everything needed to securely share configurat
 
 So, with that in mind, the following web page will use a couple of XHR requests to request a new upload URI, then send a file there. The upload is triggered when a user browses to the file they wish to upload.
 
-{% highlight html linenos %}{% raw %}
+```html
 <html>
 <head>
     <style> 
@@ -401,7 +401,7 @@ So, with that in mind, the following web page will use a couple of XHR requests 
     </div>
 </body>
 </html>
-{% endraw %}{% endhighlight %}
+```
 
 This is what the page looks like after successful execution:
 
