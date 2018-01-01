@@ -13,23 +13,27 @@ paginate: 10
 excerpt_separator: <!--more-->
 
 url: https://blog.mcguirev10.com
-title: Jon McGuire
+title: Forty Years of Code
 name: Jon McGuire
 description: "A developer blog about C#, .NET, Azure, Unity games, and other topics"
 teaser: /assets/images/index_header.jpg
 
 defaults:
-  layout: single
-  author: true
-  toc: true
-  comments: true
-  share: true
-  related: true
+  - scope:
+      path: ""
+      type: posts
+    values:
+      layout: single
+      author: true
+      toc: true
+      comments: true
+      share: true
+      related: true
 
 author:
-  name   : "Jon McGuire"
+  name   : Jon McGuire
   avatar : "/assets/images/headshot.jpg"
-  bio    : "Forty Years of Code"
+  bio    : "How hard can it be? All ya gotta do is..."
   uri    : "https://blog.mcguirev10.com"
 
 comments:
