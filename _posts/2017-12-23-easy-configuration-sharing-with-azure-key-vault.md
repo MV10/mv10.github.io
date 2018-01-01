@@ -3,7 +3,7 @@ title: Easy Configuration Sharing with Azure Key Vault
 tags: c# .net azure keyvault security
 header:
   image: "/assets/2017/12-23/header.jpg"
-teaser: "/assets/2017/12-23/header.jpg"
+  teaser: "/assets/2017/12-23/header.jpg"
 ---
 
 Developers using Azure for the first time often wonder how to centralize configuration data needed by multiple services. In this post, I will demonstrate a reusable .NET library which provides secure access to shared configuration data with a single line of code. I have used this technique to store connection strings for Azure resources such as databases, storage, and service bus topics, each used by multiple Azure App Service websites, Azure Functions, and other utility classes within the same library. This technique is not limited to connection strings. You could, for example, store access keys for external APIs.
