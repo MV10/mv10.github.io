@@ -1,6 +1,4 @@
 ---
-layout: default
-comments: true
 title: TITLE
 tags: personal c# .net azure ai odm java unity
 ---
@@ -15,6 +13,6 @@ tags: personal c# .net azure ai odm java unity
 
 ### Subheading
 
-```csharp
-// code block formatting, see _config.yml to force line numbering_
+```html
+// code block formatting, defaulted to C# and line numbering
 ```

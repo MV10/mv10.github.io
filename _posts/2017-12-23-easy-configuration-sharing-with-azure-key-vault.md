@@ -1,6 +1,4 @@
 ---
-layout: default
-comments: true
 title: Easy Configuration Sharing with Azure Key Vault
 tags: c# .net azure keyvault security
 ---

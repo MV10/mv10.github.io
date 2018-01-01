@@ -1,12 +1,12 @@
-# https://github.com/mmistakes/minimal-mistakes/issues/1339
 remote_theme: "mmistakes/minimal-mistakes"
-minimal_mistakes_skin: "neon"
+minimal_mistakes_skin: "dark"
 
 gems:
   - jekyll-sitemap
   - jekyll-paginate
   - jekyll-gist
   - jekyll-feed
+
 timezone: America/New_York
 future: true
 paginate: 10
@@ -25,6 +25,7 @@ defaults:
     values:
       layout: single
       author: true
+      author_profile: true
       toc: true
       comments: true
       share: true
@@ -33,8 +34,7 @@ defaults:
 author:
   name   : Jon McGuire
   avatar : "/assets/images/headshot.jpg"
-  bio    : "How hard can it be? All ya gotta do is..."
-  uri    : "https://blog.mcguirev10.com"
+  bio    : "All ya gotta do is..."
 
 comments:
   provider: "disqus"
