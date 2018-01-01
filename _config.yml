@@ -1,5 +1,7 @@
 # https://github.com/mmistakes/minimal-mistakes/issues/1339
 # original theme: jekyll-theme-midnight
+plugins:
+  - jekyll-remote-theme
 remote_theme: "mmistakes/minimal-mistakes""
 gems:
   - jekyll-sitemap
