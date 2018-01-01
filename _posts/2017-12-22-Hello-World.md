@@ -1,5 +1,4 @@
 ---
-layout: default
 comments: true
 title: hello_world.asm
 tags: personal

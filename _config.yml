@@ -19,6 +19,7 @@ description: "A developer blog about C#, .NET, Azure, Unity games, and other top
 teaser: /assets/images/index_header.jpg
 
 defaults:
+  layout: single
   author: true
   toc: true
   comments: true
