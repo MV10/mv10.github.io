@@ -3,6 +3,7 @@ title: hello_world.asm
 tags: personal
 header:
   image: "/assets/2017/12-22/helloworld.png"
+  teaser: "/assets/2017/12-22/helloworld.png"
 ---
 
 
@@ -37,4 +38,3 @@ START:
 END START
 ENDS
 ```
-![hello world](/assets/2017/12-22/helloworld.png)
