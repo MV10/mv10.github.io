@@ -1,5 +1,4 @@
-#theme: jekyll-theme-midnight
-remote_theme: "mmistakes/minimal-mistakes"
+theme: jekyll-theme-midnight
 gems:
   - jekyll-sitemap
   - jekyll-paginate
