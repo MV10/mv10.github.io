@@ -1,6 +1,7 @@
 # https://github.com/mmistakes/minimal-mistakes/issues/1339
-# original theme: jekyll-theme-midnight
 remote_theme: "mmistakes/minimal-mistakes"
+minimal_mistakes_skin: "neon"
+
 gems:
   - jekyll-sitemap
   - jekyll-paginate
@@ -8,11 +9,32 @@ gems:
   - jekyll-feed
 timezone: America/New_York
 future: true
-paginate: 50
+paginate: 10
 excerpt_separator: <!--more-->
+
 url: https://blog.mcguirev10.com
 title: Jon McGuire
-description: Forty Years of Coding
+name: Jon McGuire
+description: "A developer blog about C#, .NET, Azure, Unity games, and other topics"
+teaser: /assets/images/index_header.jpg
+
+defaults:
+  author: true
+  toc: true
+  comments: true
+  share: true
+  related: true
+
+author:
+  name   : "Jon McGuire"
+  avatar : "/assets/images/headshot.jpg"
+  bio    : "Forty Years of Code"
+  uri    : "https://blog.mcguirev10.com"
+
+comments:
+  provider: "disqus"
+  disqus:
+    shortname: "mv10"
 
 # everything below forces line-numbering in code blocks per > https://github.com/jekyll/jekyll/issues/4619#issuecomment-191267346
 markdown: kramdown
