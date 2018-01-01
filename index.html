@@ -1,29 +1,5 @@
 ---
-title: Table of Contents
+layout: home
+author_profile: true
 ---
 
-<!DOCTYPE html>
-<html lang="en">
-  {% include head.html %}
-<body>
-    {% include header.html %}
-
-    <div class="wrapper">
-        {% for post in paginator.posts %}
-        <section>
-            <article itemscope itemtype="https://schema.org/BlogPosting">
-                <h1><a href="{{ post.url }}"><span itemprop="name">{{ post.title }}</span></a></h1>
-                <time itemprop="datePublished" datetime="{{ post.date | date_to_xmlschema }}"><em>{{ post.date | date_to_long_string }}</em></time>
-                <div itemprop="description">
-                    {{ post.excerpt }}
-                </div>
-                <a class="button" href="{{ post.url }}" itemprop="url">Read full article</a>
-            </article>
-            <hr>
-        </section>
-        {% endfor %}
-    </div>
-
-    {% include footer.html %}
-</body>
-</html>
