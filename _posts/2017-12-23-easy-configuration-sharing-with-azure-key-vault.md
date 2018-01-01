@@ -5,13 +5,11 @@ tags: c# .net azure keyvault security
 
 ![text](/assets/2017/12-23/header.jpg)
 
-## Secure Storage and Retrieval of Configuration Data
-
 Developers using Azure for the first time often wonder how to centralize configuration data needed by multiple services. In this post, I will demonstrate a reusable .NET library which provides secure access to shared configuration data with a single line of code. I have used this technique to store connection strings for Azure resources such as databases, storage, and service bus topics, each used by multiple Azure App Service websites, Azure Functions, and other utility classes within the same library. This technique is not limited to connection strings. You could, for example, store access keys for external APIs.
 
 <!--more-->
 
-### Overview
+## Secure Storage and Retrieval of Configuration Data
 
 In this post we will to use an Azure HTTP-triggered Function to grant permission to a web application to upload a file to Azure Blob Storage, then use a Storage Trigger Function to log the file's arrival in a database. The post assumes you already have some familiarity with provisioning and using other Azure services. The shared configuration data will be the Storage and SQL connection strings.
 
@@ -32,7 +30,7 @@ In this post we will to use an Azure HTTP-triggered Function to grant permission
 
 The code portion of this post was written using Visual Studio 2017 Community Edition v15.5.2. If you haven't added Azure support to your IDE, you must run the Visual Studio 2017 Installer, click Modify, and add the "Azure development" workload in the "Web & Cloud" section of the installer.
 
-### Create a Key Vault Resource
+## Create a Key Vault Resource
 
 Since this post is focused on Key Vaults, I will not go into detail about creating and using these other Azure services. You can see below that I have already prepared a Resource Group containing a Storage Account (mv10storage), a Function App (mv10-functions, currently empty), and a SQL Server (mv10-sqlserver and mv10-sqldb) which hosts our demo log table (timestamp and description). EastUSPlan is the consumption-based provisioning plan automatically created for Function Apps. We haven't provisioned any services to host a website. For simplicity, I left the Function App open to anonymous access without CORS restrictions -- obviously this would be a Very Bad Idea in real life, even in dev, but the Resource Group will be gone by the time you read this.
 
@@ -50,7 +48,7 @@ After about ten seconds, the new Key Vault appears in our Resource Group, ready 
 
 ![resource group](/assets/2017/12-23/resourcegroup2.png)
 
-### Add Configuration Data to the Vault
+## Add Configuration Data to the Vault
 
 Our demonstration project needs to store two connection strings -- one to access the SQL database, and another to access the Blob Storage service. Key Vault can store three kinds of data: cryptographic keys, x509 certificates, and up to 25k of unstructured data called "secrets". Since we want to store connection strings, we'll be using the "secrets" feature.
 
@@ -70,7 +68,7 @@ Clicking the "+ Add" button opens a simple dialog. "Upload options" should be ch
 
 ![list of secrets](/assets/2017/12-23/secrets3.png)
 
-### Grant Access to Other Services
+## Grant Access to Other Services
 
 Now that we have securely stored our connection strings, we must grant access to each individual resource which needs them. In the case of our demo project, only the Functions App requires access. Resources are granted access through "Managed Service Identities," which are not enabled by default. On the Functions App blade, choose the Platform Features tab. A link to Managed Service Identity can be found under the Networking links. Clicking the link opens a simple panel with just one option: Off or On. Of course, we want this On so that we can reference this resource's identity in the Key Vault.
 
@@ -98,7 +96,7 @@ Finally, we click "Ok" and the process is complete! When we return to the Access
 
 ![application granted access](/assets/2017/12-23/access5.png)
 
-### Prepare the Class Library
+## Prepare the Class Library
 
 Since class library solutions often contain many different individual projects, my approach to class libraries is to begin with an empty solution so that I can assign it a sensible generic name, rather than tying the overall solution name to whatever specific project I happen to create first. Here I have opened VS2017 and chosen to create a Blank Solution named "mv10_azure_library".
 
@@ -127,7 +125,7 @@ Just two Azure packages must be added to your project from NuGet:
 
 ![nuget](/assets/2017/12-23/nuget1.png)
 
-### Accessing Key Vault Secrets
+## Accessing Key Vault Secrets
 
 Within the KeyVault project, create a new class named KeyVaultCache:
 
@@ -177,7 +175,7 @@ For the sake of simplifying an already-long post, the Key Vault URI is hard-code
 
 Consumers of this class need only call `await GetCachedSecret(secretName)` to retrieve configuration information. But we can make it even easier...
 
-### A Helper Class for Ease-of-Use
+## A Helper Class for Ease-of-Use
 
 Rather than having to remember the different names associated with the project's configuration secrets, I find it useful to create a simple helper class with methods dedicated to each secret:
 
@@ -196,7 +194,7 @@ namespace mv10_azure_library.KeyVault
 
 Now a consumer can retrieve the secret SQL connection string merely by calling `await GetSecret.SqlConnectionString()`.
 
-### Using the Library
+## Using the Library
 
 Although you can create Azure Functions directly from the Portal, and you can even download the code to edit them in Visual Studio, they use a slightly different file format (.csx) that isn't clearly documented. If I created my functions in the Portal then retrieved them using the "Download app content" button on the Functions blade in the Azure Portal, the downloaded csproj would show the following in Solution Explorer.
 
@@ -304,7 +302,7 @@ With that completed and published to Azure, we can use the Portal's Function App
 
 ![upload uri](/assets/2017/12-23/uploaduri.png)
 
-### Demo Client
+## Demo Client
 
 Even though we've already covered everything needed to securely share configuration data, we'll wrap up with a simple demonstration of an actual file upload using the components we've built. As mentioned previously, this project isn't about the client, so our Function Apps are not secure -- only the internal retrieval of the connection strings themselves are secure in this simple example. Normally you'd have to concern yourself with issues like CORS and forcing HTTPS and so on. 
 
@@ -411,7 +409,7 @@ Additionally, we can see the file in Blob Storage (remember, part of the URI ret
 
 ![log entry](/assets/2017/12-23/logentry.png)
 
-### Conclusion
+## Conclusion
 
 Although this lengthy post may give you the impression that secure shared configuration data is complex, in reality once you've gone through the process a couple of times (and have some handy utility libraries in your toolbox), it's relatively quick and easy to add new configuration data to any Azure project.
 
