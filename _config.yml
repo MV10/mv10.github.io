@@ -16,7 +16,6 @@ url: https://blog.mcguirev10.com
 title: Forty Years of Code
 name: Jon McGuire
 description: "A developer blog about C#, .NET, Azure, Unity games, and other topics"
-teaser: /assets/images/index_header.jpg
 
 defaults:
   - scope:
