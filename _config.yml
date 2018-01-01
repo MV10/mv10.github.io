@@ -1,4 +1,10 @@
-theme: jekyll-theme-midnight
+# https://github.com/mmistakes/minimal-mistakes/issues/1339
+plugins:
+  - jekyll-remote-theme
+
+remote_theme: mmistakes/minimal-mistakes
+
+#theme: jekyll-theme-midnight
 gems:
   - jekyll-sitemap
   - jekyll-paginate
