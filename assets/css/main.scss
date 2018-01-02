@@ -10,22 +10,21 @@
 html {
     font-size: 8px; // originally 16px
     @include breakpoint($medium) {
-        font-size: 10px; // originally 18px
+        font-size: 9px; // originally 18px
     }
 
     @include breakpoint($large) {
-        font-size: 12px; // originally 20px
+        font-size: 10px; // originally 20px
     }
 
     @include breakpoint($x-large) {
-        font-size: 14px; // originally 22px
+        font-size: 11px; // originally 22px
     }
 }
 
 // https://github.com/mmistakes/minimal-mistakes/blob/master/_sass/minimal-mistakes/_syntax.scss
 // https://stackoverflow.com/a/38490989/152997
-pre {
-    width: 100%;
+pre.highlight code {
     max-height: 400px;
     overflow-y: auto;
 }
