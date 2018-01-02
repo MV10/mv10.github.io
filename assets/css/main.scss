@@ -23,4 +23,11 @@ html {
     }
 }
 
+// https://github.com/mmistakes/minimal-mistakes/blob/master/_sass/minimal-mistakes/_syntax.scss
+// https://stackoverflow.com/a/38490989/152997
+.highlight pre {
+    width: 100%;
+    max-height: 300px;
+    overflow-y: auto;
+}
 
