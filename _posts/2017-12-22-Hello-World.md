@@ -1,6 +1,7 @@
 ---
 title: hello_world.asm
 tags: personal
+excerpt_separator: <!--more-->
 header:
   image: "/assets/2017/12-22/helloworld.png"
   teaser: "/assets/2017/12-22/helloworld.png"
