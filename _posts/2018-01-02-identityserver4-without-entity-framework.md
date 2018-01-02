@@ -2,8 +2,8 @@
 title: IdentityServer4 Without Entity Framework
 tags: c# .net asp.net.core security identityserver oauth2 openidconnect ado.net
 header:
-  image: "/assets/2018/mm-dd/headerpic.png"
-  teaser: "/assets/2018/mm-dd/headerpic.png"
+  image: "/assets/2018/01-02/headerpic.png"
+  teaser: "/assets/2018/01-02/headerpic.png"
 ---
 
 IdentityServer4 is arguably the most popular OpenID Connect server on the .NET platform, but like ASP.NET Core Identity, if you want persistence, you either have to accept considerable Entity Framework baggage or write it yourself. Fortunately the DIY route is easy: just three small tables and 13 SQL statements gets the job done. This post walks you through a basic IdentityServer setup with custom user-data and grant persistence using ADO.NET and SQL Server.
