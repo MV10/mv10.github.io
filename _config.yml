@@ -10,7 +10,7 @@ gems:
 timezone: America/New_York
 future: true
 paginate: 10
-
+excerpt_separator: <!--more-->
 
 url: https://mcguirev10.com
 title: Forty Years of Code
@@ -22,7 +22,6 @@ defaults:
       path: ""
       type: posts
     values:
-      excerpt_separator: <!--more-->
       layout: single
       author: true
       author_profile: true
