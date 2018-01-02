@@ -1,12 +1,10 @@
 ---
 title: hello_world.asm
 tags: personal
-excerpt_separator: <!--more-->
 header:
   image: "/assets/2017/12-22/helloworld.png"
   teaser: "/assets/2017/12-22/helloworld.png"
 ---
-
 
 "Everybody should blog," said nobody, ever. And yet here we are. Posts will focus on software development, particularly C#, .NET, Azure, and Unity games, with the occasional foray into weird stuff I'm doing at the office like IBM ODM business rules (I can't believe some people actually like using Eclipse). I suppose I should add web development to that list. I'm not especially fond of web development -- I consider HTML, CSS, and Javascript three trainwrecks that just never seem to end -- but it pays the bills better than most things I can do from the comfort of an air-conditioned office. Non-software topics are bound to show up, too. Electronics, AI, old cars, and motorsports come to mind, although I've been out of the racing loop for a few years. Heck, maybe even beer, guns, and small dogs. You never know.
 
