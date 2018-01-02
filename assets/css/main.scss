@@ -8,25 +8,25 @@
 
 // https://github.com/mmistakes/minimal-mistakes/issues/1219#issuecomment-326809412
 html {
-    font-size: 12px; // originally 16px
+    font-size: 8px; // originally 16px
     @include breakpoint($medium) {
-        font-size: 14px; // originally 18px
+        font-size: 10px; // originally 18px
     }
 
     @include breakpoint($large) {
-        font-size: 16px; // originally 20px
+        font-size: 12px; // originally 20px
     }
 
     @include breakpoint($x-large) {
-        font-size: 18px; // originally 22px
+        font-size: 14px; // originally 22px
     }
 }
 
 // https://github.com/mmistakes/minimal-mistakes/blob/master/_sass/minimal-mistakes/_syntax.scss
 // https://stackoverflow.com/a/38490989/152997
-.highlight {
+pre.highlight {
     width: 100%;
-    max-height: 600px;
+    max-height: 400px;
     overflow-y: auto;
 }
 
