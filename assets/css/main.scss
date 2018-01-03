@@ -24,7 +24,7 @@ html {
 
 // https://github.com/mmistakes/minimal-mistakes/blob/master/_sass/minimal-mistakes/_syntax.scss
 // https://stackoverflow.com/a/38490989/152997
-pre {
+pre .highlight {
     max-height: 400px;
     overflow-y: auto;
 }
