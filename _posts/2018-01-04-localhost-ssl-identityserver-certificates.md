@@ -2,8 +2,8 @@
 title: Localhost SSL and IdentityServer Token Certificates
 tags: c# .net asp.net.core security identityserver
 header:
-  image: "/assets/2018/01-04/header1280.png"
-  teaser: "/assets/2018/01-04/header1280.png"
+  image: "/assets/2018/01-04/header1280.jpg"
+  teaser: "/assets/2018/01-04/header1280.jpg"
 
 # image paths:
 #   publish:      (/assets/2018/01-04/pic.jpg)
