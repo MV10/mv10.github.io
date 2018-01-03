@@ -1,10 +1,9 @@
-﻿---
----
+--- 
+--- 
 
-@charset "utf-8";
+// https://help.github.com/articles/customizing-css-and-html-in-your-jekyll-theme/#customizing-your-jekyll-themes-css
 
-@import "minimal-mistakes/skins/{{ site.minimal_mistakes_skin | default: 'default' }}"; // skin
-@import "minimal-mistakes"; // main partials
+@import "{{ site.theme }}";
 
 // https://github.com/mmistakes/minimal-mistakes/issues/1219#issuecomment-326809412
 html {
@@ -28,5 +27,4 @@ div .highlighter-rouge {
     max-height: 400px;
     overflow-y: auto;
 }
-
 

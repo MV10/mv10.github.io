@@ -269,7 +269,7 @@ Add your connection string to the file (remember to escape any backslashes with 
 }
 ```
 
-## IdentityServer4 Configuration
+## IdentityServer Configuration
 
 There are three types of configuration data used by IdentityServer: Identity Resources, API Resources, and Clients. Configuration could be persisted to a database, but in this article we'll just create lists and pass them to IdentityServer during startup. I won't go into a lot of detail about what is happening here since it is all covered in the IdentityServer documentation, and isn't particularly important to the data persistence issue. Create a class named `ConfigureIdentityServer.cs` in your project root and add the following code to it.
 
