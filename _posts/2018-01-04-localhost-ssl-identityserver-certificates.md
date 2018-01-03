@@ -122,7 +122,7 @@ Because this script changes the certificate store, it must be run as Administrat
 
 ![Localhostca](/assets/2018/01-04/localhostca.png)
 
-You don't really need the thumbprints of these certificates for anything, but the import commandlets displays them anyway.
+You don't really need the thumbprints of these certificates for anything, but the import commandlets display them anyway.
 
 ![Localhostinstalled](/assets/2018/01-04/localhostinstalled.png)
 
@@ -204,7 +204,7 @@ This script outputs the certificate thumbprints, and this time you _do_ want to 
 
 Forgot to copy those thumbprints? Can't remember where you wrote them down?
 
-Much of Windows credentials-handling has it's roots in practically ancient operating systems like Windows NT, and sometimes that shows in the tooling. What happens if you forget the thumbprint? Why the handy-dandy futuristic GUI comes to your rescue -- double-click the .cer file and whammo, you get a Properties-like dialog with all sorts of cryptic information about the certificate. Way down at the bottom of the list on the Details tab, you can even recover the Thumbprint.
+Much of Windows credentials-handling have roots in nearly-ancient operating systems like Windows NT, and sometimes that shows in the tooling. What happens if you forget the thumbprint? Why the handy-dandy futuristic GUI comes to your rescue -- double-click the .cer file and whammo, you get a Properties-like dialog with all sorts of cryptic information about the certificate. Way down at the bottom of the list on the Details tab, you can even recover the Thumbprint.
 
 ![Thumbprint1](/assets/2018/01-04/thumbprint1.png)
 
