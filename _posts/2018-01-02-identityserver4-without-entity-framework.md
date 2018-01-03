@@ -21,6 +21,8 @@ In later articles, I'll re-use these same projects to demonstrate how to quickly
 
 This article is based upon Visual Studio 2017 v15.5.2, ASP.NET Core 2 v2.0.3, IdentityServer4 v2.0.6, System.Data.SqlClient v4.4.2, and related current tooling available as of the end of December 2017. Fair warning, this content is not especially relevant to older versions of any of these products, they've all undergone significant architectural changes within the past six months.
 
+The code is available [here](https://github.com/MV10/IdentityServer4.AdoPersistence) on GitHub.
+
 ## A Simple Client
 
 The IdentityServer4 [documentation](https://identityserver4.readthedocs.io/en/release/index.html) is excellent -- probably some of the better documentation I've seen anywhere in recent years. They also provide quite a few Quickstart templates and a simple example of an in-memory user data store that makes a pretty good model to follow. Before we work on IdentityServer, we'll spend a few minutes creating a stand-alone client client website that can be used to test a complete OAuth2 flow.
