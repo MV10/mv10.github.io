@@ -1,5 +1,5 @@
 ---
-title: Localhost SSL and IdentityServer Token Certificates
+title: Localhost SSL and IdentityServer4 Token Certificates
 tags: c# .net asp.net.core security identityserver
 header:
   image: "/assets/2018/01-04/header1280.jpg"
@@ -122,7 +122,7 @@ Because this script changes the certificate store, it must be run as Administrat
 
 ![Localhostca](/assets/2018/01-04/localhostca.png)
 
-You don't really need the thumbprints of these certificates for anything, but the import commandlets display them anyway.
+You'll need the certficate thumbprints to activate SSL in Kestrel, but don't worry about copying them now, we'll look at another way to retrieve them.
 
 ![Localhostinstalled](/assets/2018/01-04/localhostinstalled.png)
 
@@ -196,13 +196,11 @@ Write-Host "Token-validation thumbprint: " $cert.Thumbprint
 
 This script is pretty similar to that used to make the SSL credentials. Some of the certificate options have changed. You will be prompted for a password and a root domain name. Technically the domain name doesn't really matter, as no process will check it, but you might as well tie it to your domain anyway (or localhost for dev credentials). Like the others, it will abort with a warning if any of the token credential files already exist.
 
-As with the SSL certificates, you'll want to note the password you use, you'll need it later.
-
-This script outputs the certificate thumbprints, and this time you _do_ want to record them (if your Powershell console window has Quick Edit Mode active, just highlight the text with the mouse and click Enter to copy it to the clipboard). You'll use those thumbprints later to tell IdentityServer how to load the certificates.
+As with the SSL certificates, you'll want to note the password you use, you'll need it later. This script outputs the certificate thumbprints, too.
 
 ![Tokenmake](/assets/2018/01-04/tokenmake.png)
 
-Forgot to copy those thumbprints? Can't remember where you wrote them down?
+Forgot to copy those thumbprints when the certs were created? Can't remember where you wrote them down?
 
 Much of Windows credentials-handling have roots in nearly-ancient operating systems like Windows NT, and sometimes that shows in the tooling. What happens if you forget the thumbprint? Why the handy-dandy futuristic GUI comes to your rescue -- double-click the .cer file and whammo, you get a Properties-like dialog with all sorts of cryptic information about the certificate. Way down at the bottom of the list on the Details tab, you can even recover the Thumbprint.
 
@@ -224,7 +222,7 @@ foreach ($certFile in $certList)
 }
 ```
 
-When you execute this script, you get a dump of the thumbprints of all the .cer files in the folder. Handy.
+When you execute this script, you get a dump of the thumbprints of all the .cer files in the folder. Handy. If your Powershell console window has Quick Edit Mode active, just highlight the text with the mouse and click Enter to copy it to the clipboard.
 
 ![Thumbprint2](/assets/2018/01-04/thumbprint2.png)
 
