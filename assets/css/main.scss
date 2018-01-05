@@ -1,26 +1,26 @@
---- 
+﻿--- 
 --- 
 
-// https://help.github.com/articles/customizing-css-and-html-in-your-jekyll-theme/#customizing-your-jekyll-themes-css
+@charset "utf-8";
 
-@import "{{ site.theme }}";
+@import "minimal-mistakes/skins/{{ site.minimal_mistakes_skin | default: 'default' }}"; // skin
+@import "minimal-mistakes"; // main partials
 
 // https://github.com/mmistakes/minimal-mistakes/issues/1219#issuecomment-326809412
 html {
-    font-size: 9pt; // originally 16px
+    font-size: 12px; // originally 16px
     @include breakpoint($medium) {
-        font-size: 9pt; // originally 18px
+        font-size: 14px; // originally 18px
     }
 
     @include breakpoint($large) {
-        font-size: 9pt; // originally 20px
+        font-size: 16px; // originally 20px
     }
 
     @include breakpoint($x-large) {
-        font-size: 9pt; // originally 22px
+        font-size: 18px; // originally 22px
     }
 }
-
 // https://github.com/mmistakes/minimal-mistakes/blob/master/_sass/minimal-mistakes/_syntax.scss
 // https://stackoverflow.com/a/38490989/152997
 div .highlighter-rouge {
@@ -28,3 +28,6 @@ div .highlighter-rouge {
     overflow-y: auto;
 }
 
+body {
+    background: #001230;
+}
