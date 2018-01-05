@@ -244,6 +244,6 @@ Next, select the client web app project, confirm it will use Kestrel hosting, an
 
 ## Conclusion
 
-As you can see, it's relatively easy to switch to full-time SSL while avoiding browser nagging. The only other point I'd like to make is that Kestrel is not intended to run by itself. For production usage, you'd proxy requests through another web server (typically IIS or Apache, although other parts of my examples are Windows-specific, particularly the certificate store). The details are explained by Microsoft [here](https://docs.microsoft.com/en-us/aspnet/core/fundamentals/servers/?tabs=aspnetcore2x).
+As you can see, it's relatively easy to switch to full-time SSL while avoiding browser nagging. The only other point I'd like to make is that Kestrel is not intended to run by itself. For production usage, you'll often proxy requests through another web server (typically IIS or Apache, although other parts of my examples are Windows-specific, particularly the certificate store). In that case, the proxy would handle SSL and proxy-to-Kestrel communications would be internal over HTTP. The details are explained by Microsoft [here](https://docs.microsoft.com/en-us/aspnet/core/fundamentals/servers/?tabs=aspnetcore2x).
 
 ![Kestreldocs](/assets/2018/01-05/kestreldocs.png)
