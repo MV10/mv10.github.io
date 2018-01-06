@@ -1,4 +1,5 @@
 ﻿--- 
+# empty front-matter
 --- 
 
 @charset "utf-8";
@@ -6,12 +7,7 @@
 @import "minimal-mistakes/skins/{{ site.minimal_mistakes_skin | default: 'default' }}"; // skin
 @import "minimal-mistakes"; // main partials
 
-// https://github.com/mmistakes/minimal-mistakes/issues/1219#issuecomment-326809412
-
-// https://github.com/mmistakes/minimal-mistakes/blob/master/_sass/minimal-mistakes/_syntax.scss
-// https://stackoverflow.com/a/38490989/152997
-
-
 body {
     background: #001230;
 }
+
