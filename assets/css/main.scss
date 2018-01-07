@@ -1,6 +1,11 @@
 --- 
-# empty front-matter
+# front-matter
 --- 
+
+// 
+// ALWAYS do Save-As then drop-down on the Save button and choose "Unicode UTF8 without encoding"
+// otherwise the file will not compile with the leading UTF-8 Byte Order Marks.
+//
 
 @charset "utf-8";
 
@@ -15,7 +20,10 @@
 pre.highlight {
     margin: 0;
     padding: 1em;
-    max-height: 260px;
+    max-height: 300px;
     overflow-y: scroll;
 }
 
+body {
+    background-color: #001230;
+}
