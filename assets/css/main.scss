@@ -12,5 +12,10 @@
 // https://github.com/mmistakes/minimal-mistakes/blob/master/_sass/minimal-mistakes/_syntax.scss
 // https://stackoverflow.com/a/38490989/152997
 
-
+pre.highlight {
+    margin: 0;
+    padding: 1em;
+    max-height: 260px;
+    overflow-y: scroll;
+}
 
