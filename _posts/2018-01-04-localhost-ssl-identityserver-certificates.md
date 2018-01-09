@@ -120,7 +120,7 @@ Catch
 Import-Certificate -FilePath $cerFile -CertStoreLocation Cert:\CurrentUser\Root
 ```
 
-Because this script changes the certificate store, it must be run as Administrator. It will abort with a warning if the user does not have the admin role. It will also abort if the localhost certificate files are not found in the current working directory. The import of the pfx file will throw an exception if the password is incorrect. The script will catch this and abort. Finally, importing the certificate as a trusted issuing authority opens a warning dialog that you must accept to proceed.
+Because this script changes certificate stores, it must be run as Administrator. It will abort with a warning if the user does not have the admin role. It will also abort if the localhost certificate files are not found in the current working directory. The import of the pfx file will throw an exception if the password is incorrect. The script will catch this and abort. Finally, importing the certificate as a trusted issuing authority opens a warning dialog that you must accept to proceed.
 
 ![Localhostca](/assets/2018/01-04/localhostca.png)
 
@@ -132,9 +132,11 @@ If you open the Start menu and type `certlm.msc` then hit Enter, you can view th
 
 ![Certstore](/assets/2018/01-04/certstore.png) 
 
-Note you may see multiple localhost certificates listed here. Certain versions of IIS Express have the ability to generate localhost credentials.
+Note you may see multiple localhost certificates listed here. Certain versions of IIS Express have the ability to generate localhost credentials. The certficiate is loaded as a Trusted Authority only for the Current User. To view that certificate store, open the Start menu and type `certmgr.msc` and hit Enter. Open "Trusted Root Certification Authorities" then "Certificates", scroll down a bit, and you will see the "localhost" credentials here, as well. The certificate is also in the "Personal" section for Current User.
 
-At this point, anything running as `https://localhost` is considered a fully trusted, secure site as far as any browser on your computer is concerned. All that remains is to configure your web application projects to run over HTTPS, which I'll cover in another article in a few days.
+![Certstoreuser](/assets/2018/01-04/certstoreuser.png)
+
+At this point, anything running as `https://localhost` is considered a fully trusted, secure site as far as any browser running under your Windows account is concerned. All that remains is to configure your web application projects to run over HTTPS, which I'll cover in another article in a few days.
 
 ## IdentityServer Token Credentials
 
@@ -202,6 +204,10 @@ As with the SSL certificates, you'll want to note the password you use, you'll n
 
 ![Tokenmake](/assets/2018/01-04/tokenmake.png)
 
+The token certificates are automatically added to the "Personal" section of the "Local Machine" store, which you can verify by running `certmgr.msc` again (or press `F5`to refresh if the window is still open).
+
+![Certstoretokens](/assets/2018/01-04/certstoretokens.png)
+
 Forgot to copy those thumbprints when the certs were created? Can't remember where you wrote them down?
 
 Much of Windows credentials-handling have roots in nearly-ancient operating systems like Windows NT, and sometimes that shows in the tooling. What happens if you forget the thumbprint? Why the handy-dandy futuristic GUI comes to your rescue -- double-click the .cer file and whammo, you get a Properties-like dialog with all sorts of cryptic information about the certificate. Way down at the bottom of the list on the Details tab, you can even recover the Thumbprint.
@@ -230,6 +236,6 @@ When you execute this script, you get a dump of the thumbprints of all the .cer 
 
 ## Conclusion
 
-With these four utility scripts, we have everything we need to set up IdentityServer4 and an ASP.NET Core 2.0 client using HTTPS end-to-end, as well as getting rid of the dev-only `AddDeveloperSigningCredential` configuration item and replacing it with real-world `AddSigningCredential` and `AddValidationKey` certificates. 
+With these four utility scripts, we have everything we need to set up IdentityServer4 and an ASP.NET Core 2.0 client using HTTPS end-to-end, as well as getting rid of the dev-only `AddDeveloperSigningCredential` configuration item and replacing it with real-world `AddSigningCredential` and `AddValidationKey` certificates.
 
 In the next installment, we'll put all of these certificates to work!
