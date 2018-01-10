@@ -149,7 +149,7 @@ $bytes = $coll.Export($type)
 
 # base64 encode
 $base64 = [System.Convert]::ToBase64String($bytes)
-$value = ConvertTo-SecureString -String $base64 -AsPlainText –Force
+$value = ConvertTo-SecureString -String $base64 -AsPlainText â€“Force
 
 # send it to Azure KeyVault
 $type = 'application/x-pkcs12'
