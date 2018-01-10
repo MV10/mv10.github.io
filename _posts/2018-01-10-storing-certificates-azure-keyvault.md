@@ -212,7 +212,10 @@ If you followed my earlier Key Vault article exactly, you should add the followi
 using mv10_azure_library.KeyVault;
 ```
 
-Now add the following code to `ConfigureServices` **before** the call to `services.AddMvc` in both Startup classes. Data Protection is used within `AddMvc` processing, so the correct storage and certificate configuration must be established first.
+Now add the following code at the very top of the `ConfigureServices` method in both Startup classes. 
+
+**Important:** Data Protection must be configured **before** the call to `services.AddMvc`. Data Protection is used within `AddMvc` processing, so the correct storage and certificate configuration must be established first.
+{: .notice--warning}
 
 ```
 var blobAccount = CloudStorageAccount.Parse(GetSecret.StorageConnectionString().GetAwaiter().GetResult());
