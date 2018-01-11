@@ -21,6 +21,9 @@ More introductory text that won't be on the index page.
 
 blah blah blah
 
+**Boldface:** The tag after this paragraph causes it to render in a yellow-background "warning" box. See [utility classes](https://mmistakes.github.io/minimal-mistakes/docs/utility-classes/)
+{: .notice--warning}
+
 ```html
 // code block formatting, defaulted to C# and line numbering
 ```
