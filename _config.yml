@@ -4,10 +4,10 @@ remote_theme: "mmistakes/minimal-mistakes"
 minimal_mistakes_skin: "neon"
 
 gems:
-  - jekyll-sitemap
-  - jekyll-paginate
-  - jekyll-gist
-  - jekyll-feed
+  # - jekyll-sitemap
+  # - jekyll-paginate
+  # - jekyll-gist
+  # - jekyll-feed
 
 timezone: America/New_York
 future: true
