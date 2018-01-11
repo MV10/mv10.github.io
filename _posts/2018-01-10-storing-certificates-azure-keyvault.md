@@ -22,6 +22,8 @@ This article will build upon tools and concepts presented in two recent posts:
 
 We'll create a new Powershell script to generate a certificate for ASP.NET Core's Data Protection feature, another Powershell script to serialize and upload X.509 certificate PFX files to Azure Key Vault, and expand the `GetSecret` utility class to retrieve, cache, and deserialize those certificates on demand. Finally, we'll explore how to leverage the new capabilities in an ASP.NET Core application and in Identity Server.
 
+The Powershell scripts in this article are available from [this repository](https://github.com/MV10/x509.certificate.tools).
+
 ## ASP.NET Core Data Protection
 
 The Data Protection (DPAPI) feature of ASP.NET Core is meant to protect "data at rest" -- data that is persisted to some type of storage medium. This may be data your program explicitly stores by calling DPAPI methods like `Protect` and `Unprotect`, but it also applies to certain pieces of data ASP.NET Core stores automatically, including login data. If you do not provide an X.509 certificate for these cryptography operations, DPAPI will automatically generate a new key upon startup. This means anything stored in a previous session -- such as login tokens -- are no longer decipherable from a new session. Also, in a webfarm setting, providing a centralized storage mechanism along with a shared cryptography certificate means all servers can read each other's data securely.

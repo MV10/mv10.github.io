@@ -23,6 +23,8 @@ We'll generate the certificates using convenient Powershell scripts. For SSL sup
 
 The Powershell scripts will also automate generation of token signing and token validation certificates for use with IdentityServer4's `AddSigningCredential` and `AddValidationKey` configuration options. In this case, you _can_ use self-signed certificates for both development and production scenarios. In this case, there is no need for a trusted authority, the credentials aren't being used to assert identity, as in the case of SSL. Think of them as more of an anti-tampering mechanism for IdentityServer's internal use.
 
+The Powershell scripts in this article are available from [this repository](https://github.com/MV10/x509.certificate.tools).
+
 ## Generating SSL Credentials
 
 Create a folder for your project credentials, make a new file named `cert_make_localhost_ssl.ps1`, and add the following script.
