@@ -1,4 +1,4 @@
---- 
+﻿--- 
 # front-matter
 --- 
 
@@ -12,6 +12,7 @@
 @import "minimal-mistakes/skins/{{ site.minimal_mistakes_skin | default: 'default' }}"; // skin
 @import "minimal-mistakes"; // main partials
 
+/*
 // https://github.com/mmistakes/minimal-mistakes/issues/1219#issuecomment-326809412
 html {
     font-size: 15px; // originally 16px
@@ -36,3 +37,4 @@ pre.highlight {
     max-height: 300px;
     overflow-y: scroll;
 }
+*/
