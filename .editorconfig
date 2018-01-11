@@ -1,0 +1,7 @@
+# http://editorconfig.org/
+
+root = true
+
+# disable UTF8 byte order mark, which causes many command-line tools to crash
+[*]
+charset = utf-8
