@@ -2,12 +2,6 @@
 # front-matter
 --- 
 
-// 
-// ALWAYS do Save-As then drop-down on the Save button and choose "Unicode UTF8 without encoding"
-// otherwise the file will not compile with the leading UTF-8 Byte Order Marks. Inspect the file
-// by uploading to https://www.onlinehexeditor.com/
-//
-
 @charset "utf-8";
 
 @import "minimal-mistakes/skins/{{ site.minimal_mistakes_skin | default: 'default' }}"; // skin
