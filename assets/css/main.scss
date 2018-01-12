@@ -5,6 +5,7 @@
 @charset "utf-8";
 
 @import "minimal-mistakes/skins/{{ site.minimal_mistakes_skin | default: 'default' }}"; // skin
+@import "minimal-mistakes"; // main partials
 
 // syntax highlighting from the "contrast" skin
 // https://mmistakes.github.io/minimal-mistakes/docs/stylesheets/#colors
@@ -24,8 +25,6 @@ $base0c: #c6c5fe !important;
 $base0d: #96cbfe !important;
 $base0e: #ff73fd !important;
 $base0f: #b18a3d !important;
-
-@import "minimal-mistakes"; // main partials
 
 // https://github.com/mmistakes/minimal-mistakes/issues/1219#issuecomment-326809412
 html {
