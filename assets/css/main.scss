@@ -52,3 +52,11 @@ pre.highlight {
     overflow-y: scroll;
 }
 
+// https: //github.com/mmistakes/minimal-mistakes/issues/1467#issuecomment-357399471
+&.rouge-gutter {
+    @extend &.gutter;
+}
+
+&.rouge-code {
+    @extend &.code;
+}
