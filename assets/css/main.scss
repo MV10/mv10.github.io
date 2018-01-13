@@ -53,10 +53,10 @@ pre.highlight {
 }
 
 // https: //github.com/mmistakes/minimal-mistakes/issues/1467#issuecomment-357399471
-&.rouge-gutter {
-    @extend &.gutter;
+td.rouge-gutter {
+    @extend td.gutter;
 }
 
-&.rouge-code {
-    @extend &.code;
+td.rouge-code {
+    @extend td.code;
 }
