@@ -199,6 +199,7 @@ Finally, we must register the service for dependency inject. Open the client app
 ```
 using ClientWebApp.Services;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
+using IdentityModel;
 ```
 
 Now add the following to the very end of the `ConfigureServices` method.
@@ -244,7 +245,7 @@ In the earlier article, the `AddAuthentication` configuration established cookie
         {
             OnRedirectToIdentityProvider = context =>
             {
-                context.ProtocolMessage.Prompt = "none";
+                context.ProtocolMessage.Prompt = OidcConstants.PromptModes.None;
                 return Task.FromResult<object>(null);
             },
 
@@ -285,7 +286,7 @@ using System;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
-namespace Site.Pages
+namespace ClientWebApp.Pages
 {
     public class IndexModel : PageModel
     {
