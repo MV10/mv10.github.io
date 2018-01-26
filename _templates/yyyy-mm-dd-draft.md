@@ -27,3 +27,6 @@ blah blah blah
 ```html
 // code block formatting, defaulted to C# and line numbering
 ```
+
+Format to reference another post:
+[plaintext]({{ site.baseurl }}{% post_url 2018-01-05-https-identityserver-aspnetcore %})
