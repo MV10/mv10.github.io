@@ -18,7 +18,7 @@ Fast forward a couple of years, and suddenly ChatterBook has gone the way of MyS
 
 And there's the hitch with third-party authentication: How do you let the user migrate their account to a different identity provider?
 
-This article _isn't_ about solving that problem. It actually isn't a difficult problem to solve, most sites just ignore it altogether (and I suspect they may not realize the problem exists). This article is about a subtle and perlexing issue that arose while addressing that problem.
+This article _isn't_ about solving that problem. It actually isn't a difficult problem to solve, most sites just ignore it altogether (and I suspect they may not realize the problem exists). This article is about a subtle problem that arose while addressing that requirement.
 
 ## Identity Provider Migration
 
