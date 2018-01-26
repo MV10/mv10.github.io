@@ -4,11 +4,6 @@ tags: c# .net asp.net.core security identityserver
 header:
   image: "/assets/2018/01-26/header1280.png"
   teaser: "/assets/2018/01-26/header1280.png"
-
-# image paths:
-#   publish:      (/assets/2018/01-26/pic.jpg)
-#   edit _drafts: (assets/2018/01-26/pic.jpg)
-#   edit _post:   (../assets/2018/01-26/pic.jpg)
 ---
 
 Handling sign-out correctly can be complicated, and the behavior of ASP.NET Core's `SignOutAsync` method is not always obvious. We'll examine one common scenario that can be very difficult to diagnose.
