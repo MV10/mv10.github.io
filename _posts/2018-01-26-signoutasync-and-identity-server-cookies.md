@@ -81,7 +81,7 @@ The details of what that code is doing aren't important. What matters is that _b
 
 And yet, clicking the `Login` button immediately returned the user to the client application's Index page, and the user was once again fully logged-in. No login page was presented. Similarly, if the user didn't click the `Login` button, but instead navigated back to the client app homepage, they were automatically logged back in.
 
-Anyone familiar with the OIDC flow and/or Identity Server will recognize that the user was still logged in on the Identity Server side. When that happens, no login UI is presented. Identity Server recognizes the user and can "restore" their signed-in status automatically. Indeed, we rely upon this behavior in my earlier article, [Persistent Login with IdentityServer4]({{ site.baseurl }}{% post_url 2018-01-12-https-persistent-login-with-identityserver %}) to keep a user logged in across multiple sessions.
+Anyone familiar with the OIDC flow and/or Identity Server will recognize that the user was still logged in on the Identity Server side. When that happens, no login UI is presented. Identity Server recognizes the user and can "restore" their signed-in status automatically. Indeed, we rely upon this behavior in my earlier article, [Persistent Login with IdentityServer4]({{ site.baseurl }}{% post_url 2018-01-12-persistent-login-with-identityserver %}) to keep a user logged in across multiple sessions.
 
 The mystery isn't why the user is logged in again -- it's why they weren't logged out on _both_ servers regardless of which bit of code called our two-line sign-out method. After all, the `Login` link in the header of _the same page_ (the one that handles IdP migration) works reliably every time, and they're both calling the same `AccountService` method.
 
@@ -91,7 +91,7 @@ A quick trip through Chrome's `F12` network log proved the sign-out code behaved
 
 ![trafficlogoutlink](/assets/2018/01-26/trafficlogoutlink.png)
 
-It begins with the `HTTP POST` to the `Logout` action in `AccountController`. As we saw earlier, that doesn't do anything but `await` the two-line `AccountService` sign-out method. Those calls to `HttpContext.SignOutAsync` result in the OIDC endsession flow. (The final two requests are the client site's attempt to restore a persistent login, as described in the [earlier article]({{ site.baseurl }}{% post_url 2018-01-12-https-persistent-login-with-identityserver %}).)
+It begins with the `HTTP POST` to the `Logout` action in `AccountController`. As we saw earlier, that doesn't do anything but `await` the two-line `AccountService` sign-out method. Those calls to `HttpContext.SignOutAsync` result in the OIDC endsession flow. (The final two requests are the client site's attempt to restore a persistent login, as described in the [earlier article]({{ site.baseurl }}{% post_url 2018-01-12-persistent-login-with-identityserver %}).)
 
 But sign-out from the `OnPostMigrateAccount` handler tells a very different story:
 
