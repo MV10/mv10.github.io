@@ -8,6 +8,7 @@
 
 // syntax highlighting from the "contrast" skin
 // https://mmistakes.github.io/minimal-mistakes/docs/stylesheets/#colors
+/*
 $base00: #000000 !important;
 $base01: #242422 !important;
 $base02: #484844 !important;
@@ -24,9 +25,11 @@ $base0c: #c6c5fe !important;
 $base0d: #96cbfe !important;
 $base0e: #ff73fd !important;
 $base0f: #b18a3d !important;
+*/
 
 @import "minimal-mistakes"; // main partials
 
+/*
 // https://github.com/mmistakes/minimal-mistakes/issues/1219#issuecomment-326809412
 html {
     font-size: 15px; // originally 16px
@@ -60,3 +63,4 @@ td.rouge-gutter {
 td.rouge-code {
     @extend td.code;
 }
+*/
