@@ -28,7 +28,7 @@ In our system, we have an additional complicating factor: users may also login w
 
 The trick to IdP migration is to identify a common factor between the IdPs, and for all practical purposes, that factor will be the user's email address. Certain standards bodies state that email should not be treated as a unique identifier, but in the real world, if your site doesn't know your user's email address, your users probably aren't doing much that is interesting anyway. Important features like password reset treat email as sufficiently secure and unique, so it's a pretty safe assumption for IdP migration, too -- just be _certain_ your users understand that, as well.
 
-As stated earlier, the solution is simple. When a logged-in user indicates a desire to migrate their account to a new IdP, drop a flag in the database, logout the user, and send them back to the login page. The account is migrated during the new login flow. Somewhere in that process, explain that they need only login again with their new IdP, and that both IdPs must reference the same email address. Additionally, the user can cancel this change by logging into the same IdP again.
+As stated earlier, the solution is simple. When a logged-in user indicates a desire to migrate their account to a new IdP, drop a flag in the database, logout the user, and send them back to the login page. The account is migrated during the new login flow. Somewhere in that process, explain that they need only login with their new IdP, and that both IdPs must reference the same email address. Additionally, the user can cancel this change by logging into the original IdP again.
 
 While processing the login, the new IdP will appear to be a new account. In that case, check the database for a different user with the same email address (something you should guard against anyway), and if _that_ user account has the "migrate" flag (we actually use a `CryptoRandom` code, an expiration, and some other safety-features), drop the old IdP and substitute the new one, and skip the new-account creation.
 
@@ -65,7 +65,7 @@ public async Task Logout()
 }
 ```
 
-Here is the confusing part: Although signout worked perfectly from the `Logout` link in the page header, the user was only _temporarily_ signed out when this Razor Pages postback-handler was executed to begin the IdP-migration process:
+Here is the confusing part: Although signout worked perfectly from the `Logout` link in the page header, the user was only _temporarily_ signed out when this Razor Pages postback-handler was executed to begin the IdP-migration process. Notice line 5 in this method and the one above:
 
 ```
 public async Task<IActionResult> OnPostMigrateAccount()
@@ -77,9 +77,9 @@ public async Task<IActionResult> OnPostMigrateAccount()
 }
 ```
 
-The details of what that code is doing aren't important. What matters is that _both_ sign-out processes call that two-line `SignOutAsync` method, yet only one achieved _permanent_ signout. When the user landed on the `MigrateInstructions` page (reminders about how to migrate, how to cancel the migration request, and a `Login` button that triggered the OIDC login flow), some client-side Razor debug code demonstrated that `User.Identity.IsAuthenticated` was `false`. As far as the ASP.NET Core client web app was concerned, the user really was logged out.
+The details of how that code sets up the IdP migration aren't important. What matters is that _both_ sign-out processes call that two-line `SignOutAsync` method, yet only one achieved _permanent_ signout. When the user landed on the `MigrateInstructions` page, some client-side Razor debug code showed that `User.Identity.IsAuthenticated` was `false`. As far as ASP.NET Core's Identity system servicing the client web app was concerned, the user really was logged out at that point in time.
 
-And yet, clicking the `Login` button immediately returned the user to the client application's Index page, and the user was once again fully logged-in. No login page was presented. Similarly, if the user didn't click the `Login` button, but instead navigated back to the client app homepage, they were automatically logged back in.
+And yet, clicking the `Login` button on that page immediately returned the user to the client application's Index page, and the user was once again fully logged-in. No login page was presented. Similarly, if the user didn't click the `Login` button, but instead navigated back to the client app homepage, they were automatically logged back in.
 
 Anyone familiar with the OIDC flow and/or Identity Server will recognize that the user was still logged in on the Identity Server side. When that happens, no login UI is presented. Identity Server recognizes the user and can "restore" their signed-in status automatically. Indeed, we rely upon this behavior in my earlier article, [Persistent Login with IdentityServer4]({{ site.baseurl }}{% post_url 2018-01-12-persistent-login-with-identityserver %}) to keep a user logged in across multiple sessions.
 
@@ -91,15 +91,15 @@ A quick trip through Chrome's `F12` network log proved the sign-out code behaved
 
 ![trafficlogoutlink](/assets/2018/01-26/trafficlogoutlink.png)
 
-It begins with the `HTTP POST` to the `Logout` action in `AccountController`. As we saw earlier, that doesn't do anything but `await` the two-line `AccountService` sign-out method. Those calls to `HttpContext.SignOutAsync` result in the OIDC endsession flow. (The final two requests are the client site's attempt to restore a persistent login, as described in the [earlier article]({{ site.baseurl }}{% post_url 2018-01-12-persistent-login-with-identityserver %}).)
+It begins with the `HTTP POST` to the `Logout` action in `AccountController`. As we saw earlier, that doesn't do anything but `await` the two-line `AccountService` sign-out method. Those calls to `HttpContext.SignOutAsync` result in the OIDC endsession flow. The final two requests are the client site's attempt to restore a persistent login, as described in the [earlier article]({{ site.baseurl }}{% post_url 2018-01-12-persistent-login-with-identityserver %}). This attempt fails because the user is signed out in Identity Server -- exactly what we're trying to achieve here.
 
-But sign-out from the `OnPostMigrateAccount` handler tells a very different story:
+However, sign-out from the `OnPostMigrateAccount` handler tells a very different story:
 
 ![trafficmigratelink1](/assets/2018/01-26/trafficmigratelink1.png)
 
-There is only the `HTTP POST` to the `OnPostMigrateAccount` hander followed by the final redirect to the migration instructions. For some reason, `HttpContext.SignOutAsync` removed the local cookies but seems to have ignored the OIDC endsession flow.
+There is only the `HTTP POST` to the `OnPostMigrateAccount` hander followed by the final redirect to the migration instructions. For some reason, `HttpContext.SignOutAsync` removed the local cookies (which is why the Razor debug code shows `User.Identity.IsAuthenticate` is `false` on that page), but seems to have ignored the OIDC endsession flow. As soon as we do anything that checks Identity Server for a persistent login, the user's login is restored.
 
-Perplexing.
+Different behavior based on where the call originated? Perplexing.
 
 ## Behavior Modification
 
