@@ -31,7 +31,7 @@ Here are the topics we'll consider:
 * Allowing users to change their IdP
 * Reminding users which IdP they chose
 * Failed-login lockouts
-* Translating the Windows `Claim.Issuer` default
+* Translating the default Windows `Claim.Issuer`
 * `POST` vs `GET` endpoints
 
 By the time we're finished, you'll understand why the ASP.NET Core Identity template that comes with Visual Studio, or the Identity Server Quickstart UI projects are only partial solutions to identity and account management, and why both Microsoft and the Identity Server team warn that those samples are not production-ready implementations. The majority of the issues we'll discuss simply aren't addressed by those demo-grade code samples.
@@ -46,7 +46,7 @@ Generally speaking, you should expect to store a lot more data about your users 
 
 ## Prompting Anonymous Users
 
-When a user first arrives at your client site, they will be anonymous. If the user is new, they'll want to create an account on your site, either through a third-party IdP, or by registering a local account. If the user already has an account, they'll want to login.
+When a user first arrives at your client site, they will be anonymous. If the user is new, they'll want to create an account on your site, either through a third-party IdP or by registering a local account. If the user already has an account, they'll want to login.
 
 Are these two separate use-cases? Yes and no. The Identity Server Quickstart UI doesn't address new user registration at all, and the ASP.NET Core Identity template sample-code treats them as separate issues.
 
@@ -56,7 +56,7 @@ Login with OIDC requires the client application to start the flow, and since you
 
 The need to store your own user data implies a need to recognize when a third-party login represents a new user. In theory, if a user signs in via Google (for example), you should check your database for a user record whose IdP is Google and the IdP Subject Id on that same user record matches the Subject Id claim received from the IdP.
 
-Logically, if there isn't a user account that matches the IdP Subject Id from that IdP, then it's a new user. Or is it? What if the user originally joined your site with a Microsoft login, and later forgot that fact and tried to login via a Google account, instead?
+Logically, if there isn't a user account that matches the IdP Subject Id from that IdP, then it's a new user. Or is it? What if the user originally joined your site with a Microsoft login, but later forgot that fact and tried to login via a Google account, instead?
 
 In our system, we require all users to have a valid email address on file. When the scenario above takes place, we don't immediately assume the login is a new account. We look for an email claim, and we search for that in the database. If we find it, we assume this user simply chose the wrong login provider. We send a reminder email, and we route the user to a message asking them to check their email.
 
@@ -76,9 +76,9 @@ Creating new accounts potentially involves checking that a newly-entered email a
 
 We mentioned earlier that we'd prefer to isolate identity-related concerns in the identity management system to the greatest extent possible, so this implies that system should handle email verification with minimal impact on the client application. A complicating factor is that OIDC requires the client application to initiate login requests.
 
-This is potentially a problem for email verification because you're now sending the user out of the login-flow. When they click that verification link in the email, they're starting a brand new browsing session -- with the identity provider. The user is no longer in the middle of an OIDC login flow initated by the client site.
+This is potentially a problem for email verification because you're now sending the user out of the login-flow. When they click that verification link in the email, they're starting a brand new browsing session -- a session only the identity service knows about. The user is no longer in the middle of an OIDC login flow initated by the client site.
 
-We resolve this by creating a small table used to authorize accounts to perform various activites -- email verification, password reset, and IdP migration are examples (we'll talk about the last two scenarios in a bit). The table contains the user id (you could use the locally-assigned Subject Id, it serves the same purpose, but we prefer auto-incremented identity-column integers for database-level foreign keys), a token generated with crypto-grade randomization, a flag to indicate the authorization type, an optional expiration timestamp, and crucially, the `ClientId` that Identity Server uses in the `Client` configuration data.
+We resolve this by creating a simple table used to authorize accounts to perform various activites -- email verification, password reset, and IdP migration are examples (we'll talk about the last two scenarios in a bit). The table contains the user id (you could use the locally-assigned Subject Id, it serves the same purpose, but we prefer auto-incremented identity-column integers for database-level foreign keys), a token generated with crypto-grade randomization, a flag to indicate the authorization type, an optional expiration timestamp, and crucially, the `ClientId` that Identity Server uses in the `Client` configuration data.
 
 The token is a parameter in the verification link in the email sent to the user. When the user arrives, we validate the token against the database and flag the user's email account as verified. 
 
@@ -90,13 +90,15 @@ A secure plan for handling passwords should never include reversible encryption,
 
 We use the same authorization token process described in the previous section for email verification, and like that process, the final step is to re-start the OIDC login flow with a callback to the client application.
 
+A common alternative is to send a cut-and-paste code in the email, allowing the user to enter that code to proceed, but that actually requires more work both from the development standpoint and the user-effort standpoint.
+
 ## Persistent Logins
 
-Most modern-day websites support persistent login, and you should probably consider supporting it for your site. Since we wrote about this in an [earlier article]({{ site.baseurl }}{% post_url 2018-01-12-persistent-login-with-identityserver %}), I won't rehash those details, but it should definitely be on your to-do list.
+Most modern-day websites support persistent login, and you should probably consider supporting it for your site. Since we wrote about this extensively in an [earlier article]({{ site.baseurl }}{% post_url 2018-01-12-persistent-login-with-identityserver %}), I won't rehash those details, but it should definitely be on your to-do list.
 
 ## Bookmarks to the Login Page
 
-There have been several StackOverflow and Github issue questions around dealing with this problem. By now, you're familiar with the requirement that OIDC login flows start from the client application. So what happens if the user browses directly to your identity service's login page?
+There are frequent StackOverflow and Github questions around dealing with this problem. By now, you're familiar with the requirement that OIDC login flows start from the client application. So what happens if the user browses directly to your identity service's login page?
 
 If your identity service only supports a single client site, the answer is simple: redirect to the client's base URI. On the other hand, if your identity service manages identity for multiple client sites (and this is really the primary use-case for a stand-alone service: single sign-on, or SSO), there isn't really a _great_ answer for this.
 
@@ -104,19 +106,19 @@ When a user initially joins the site, we store the `ClientId` that started the O
 
 ## Changing Identity Providers
 
-Briefly, users may wish to change their mind about how they log into your sites, and fortunately this is easy to do, which makes it a little strange that it's such a rare feature. In the [article](post_url 2018-01-26-signoutasync-and-identity-server-cookie) mentioned in the email verification topic earlier, this is actually the reason for presenting the account verification and OIDC-restart concepts. If you want more information about how we achieve what I call IdP migration, that's the place to start.
+Users may change their mind about how they log into your sites, and fortunately this is easy to allow, which makes it a little strange that it's such a rare feature. I call this IdP migration. In the [article](post_url 2018-01-26-signoutasync-and-identity-server-cookie) mentioned in the email verification topic earlier, this is actually the reason for presenting the account verification and OIDC-restart concepts. If you want more information about how we achieve this, that's the place to start.
 
-Incidentally, just a few hours after posting that article, I did find the first example of IdP migration "in the wild": GitLab. Unfortunately, if you want to actually _use_ GitLab for source control, they force you to create a local username/password, so I'm not entirely sure why they support third-party logins at all, but at least someone recognizes that IdP migration is desirable.
+Incidentally, just a few hours after posting that article, I did find the first example of IdP migration I've ever seen "in the wild" on GitLab. Unfortunately, if you want to actually _use_ GitLab for source control, they force you to create a local username/password, so I'm not entirely sure why they support third-party logins at all, but at least someone recognizes that IdP migration is desirable.
 
 ## Identity Provider Reminder
 
-This is another nice-to-have edge-case feature that is easy to implement. Our system currently supports six IdPs, and while developing and testing the IdP migration feature, I caught myself occasionally referring to the database to remind myself which IdP my test account was using last.
+This is another nice-to-have edge-case feature that is easy to implement. Our system currently supports six IdPs, and while developing and testing the IdP migration feature, I caught myself occasionally referring to the database to remind myself which IdP my test account was using.
 
 I realized I've occasionally had this problem in the real world. I'll hear of some useful-sounding site, only to find that I'd registered there before, at some time in the distant past. Usually this is a username/password local login that either rejects my username or email address as already-in-use, but I've also had it happen at least once with a third-party login. (Yes, I'm getting old, sometimes I forget things.)
 
 There are two opportunities to improve the UX around this issue.
 
-In the process of allowing IdP migration, we look for a new-account IdP login and we compare the user's new IdP-email address to the database. If the email address is already known _and_ the account is authorized for IdP migration, we process the migration. However, if the account is _not_ authorized for IdP migration, we can interrupt the login and send the user a helpful email remider, something along the lines of, "You tried to log into our site with Google, but your email address is already on file with a Microsoft account. Please try again. You can change login providers later from the Manage Account page."
+In the process of allowing IdP migration, we look for a new-account IdP login and we compare the user's new IdP-email address to the database. If the email address is already known _and_ the account is authorized for IdP migration, we process the migration. However, if the account is _not_ authorized for IdP migration, we can interrupt the login and send the user a helpful email remider along the lines of, "You tried to log into our site with Google, but your email address is already registered with your Microsoft account. Please try again. You can change login providers later from the Manage Account page."
 
 Similarly, a user may recognize up front that they don't remember their IdP, so it's a simple process to add a "remind me" button or link to your login page.
 
@@ -128,15 +130,15 @@ This is a pretty typical feature, so I won't say much about it except to ensure 
 
 One aspect to consider is whether expired tokens for email verification, IdP migration, and password reset authorizations should count against the failed login attempts.
 
-We also asked ourselves what to do once the account was locked. The final decision was to send another type of email, this time with either two links (again based on the same authorization tokens used for password reset and so on). The first link allows the user to unlock the account to keep trying. The second link allows the user to initiate a password reset.
+We also asked ourselves what to do once the account was locked. The final decision was to send another type of email, this time with two links (again based on the same authorization tokens used for password reset and so on). The first link allows the user to unlock the account to keep trying. The second link allows the user to initiate a password reset.
 
-In theory, this means if the user's email is compromised but their account in our system is not, this will also compromise the account. However, the standard reset password feature carries the same risk, so we felt this is acceptable.
+In theory, this means if the user's email is compromised but their account in our system is not, this will also compromise the account. However, the standard reset password feature carries the same risk. This is just a shortcut to the same functionality already available from the login page.
 
 ## Respect My Authority
 
-All the properties of a `Claim` object are read-only. When your code creates a new `Claim`, if you don't provide an `Issuer` name in the constructor, Windows will default to the user-unfriendly string `LOCAL AUTHORITY`. If you follow the Identity Server 4 Quickstart.UI or any of the related articles I've written, you'll have a few of these for local accounts, but you'll also have at least one and probably two (the local Subject Id and the username) even for third-party logins.
+All the properties of a `Claim` object are read-only. When your code creates a new `Claim`, if you don't provide an `Issuer` name in the constructor Windows will default to the user-unfriendly string `LOCAL AUTHORITY`. If you follow the Identity Server 4 Quickstart.UI or any of the related articles I've written, you'll have a few of these for local accounts, but you'll also have at least one and probably two (the local Subject Id and the username) even for third-party logins.
 
-For all end-user communications, we translate this to "local username/password", and which means email and message templates work equally well for third-party providers and local accounts.
+For all end-user communications, we translate this to "local username/password", which means email and message templates work equally well for third-party providers and local accounts.
 
 ## Use `HTTP POST` Whenever Possible
 
@@ -154,7 +156,7 @@ Notice that the preceding topics concentrate identity management in the identity
 * "Logout" link to start an OIDC signout flow
 * Redirect endpoint to start an OIDC signin flow
 * UI to request email, password, and IdP changes
-* Query the user's data from the authorized ASP.NET `User` Subject Id
+* Query user data using the authorized ASP.NET `User` Subject Id
 
 Most of these can be implemented with just a few lines of code, then secure the rest of your site with standard `[Authorize]` attributes.
 
