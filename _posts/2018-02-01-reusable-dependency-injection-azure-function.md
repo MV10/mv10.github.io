@@ -1,6 +1,6 @@
 ---
 title: Reusable Dependency Injection for Azure Function Apps
-tags: personal c# .net azure ai odm java unity
+tags: c# .net azure azure.functions dependency.injection
 header:
   image: "/assets/2018/02-01/header1280.png"
   teaser: "/assets/2018/02-01/header1280.png"
@@ -22,7 +22,7 @@ I spent some time reviewing their work and realized they were very close to a re
 
 ## Using the Attributes
 
-Azure Functions are `static` classes, which makes them incompatible with the normal constructor-based DI. BorisWilhelms' solution was to create an `[Inject]` attribute which can be applied to Function parameters to declare dependencies. From there, yuka1984 created an injection-configuration custom Function trigger and changed the `[Inject]` attribute to also reference the function that registers the DI services. 
+Azure Functions are `static` classes, which makes them incompatible with the normal constructor-based DI. BorisWilhelms' solution was to create an `[Inject]` attribute which can be applied to Function parameters to declare dependencies. From there, yuka1984 created an injection-configuration custom Function trigger and changed the `[Inject]` attribute to also reference the function name that registers the DI services. I renamed the trigger to `[RegisterServicesTrigger]` to better reflect what happens when the Functions execute.
 
 Injection configuration is triggered by the injection request.
 
@@ -40,7 +40,7 @@ public static class DemoFunction
         }
 
         [FunctionName("Registration")]
-        public static void Config([InjectorConfigTrigger] IServiceCollection services)
+        public static void Config([RegisterServicesTrigger] IServiceCollection services)
         {
             services.AddSingleton<IUsefulDataProvider, UsefulDataProvider>();
         }
@@ -50,6 +50,8 @@ public static class DemoFunction
 Although it isn't obvious from looking at the code above, one of the really interesting ideas in yuka1984's solution is to use a `Lazy<>` approach to activation of the trigger Function. Thus, service registration is not actually processed until it is used, and it is only processed once regardless of how many `[Inject]` tags reference it.
 
 Since Azure Function apps are only C# class libraries as far as the compiler is concerned, treating the end-result as a library was trivial. I just created a new Function project to act as the "main" project (the one that actually runs Functions) and referenced the DI project from there. After a recompile, the attributes just work.
+
+A useful feature I added is a default registration Function name of `RegisterServices` for the `[Inject]` attribute. Most Function apps will only need a single registration Function, and you'll still have to add the `[FunctionName("RegisterServices")] attribute to the trigger Function for it to work, but the trigger name should help to jog your memory. 
 
 ## Verifying Full-Graph Injection
 
@@ -121,7 +123,7 @@ For my real-world class library, I have to consider many different use-cases. We
 
 Earlier I mentioned that I didn't like the way service registration was tightly tied to the rest of the DI code in the original example from BorisWilhelms. When I first reviewed yuka1984's changes, I also initially questioned service registration localized to the Function class. 
 
-I spent a few hours considering ways to move registration to a separate class within the Function app, similar to the way ASP.NET Core relies upon `Startup.cs` to register services. However, executing a Function in another class turns out to be very complicated (and maybe impossible) in a Function app. The class `InjectorConfigTrigger` has a method called `AddConfigExecutor` which is defines the `Lazy<>` reference to the configuration Function. In the source, you'll find the following line of code:
+I spent a few hours considering ways to move registration to a separate class within the Function app, similar to the way ASP.NET Core relies upon `Startup.cs` to register services. However, executing a Function in another class turns out to be very complicated (and maybe impossible) in a Function app. The class `RegisterServicesTrigger` has a method called `AddConfigExecutor` which is defines the `Lazy<>` reference to the configuration Function. In the source, you'll find the following line of code:
 
 ```
 executor.TryExecuteAsync(
