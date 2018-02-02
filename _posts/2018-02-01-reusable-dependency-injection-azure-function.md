@@ -14,9 +14,7 @@ Code for this article can be found [here](https://github.com/MV10/Azure.Function
 
 Dependency injection has become a standard technique for writing testable, loosely-coupled applications and libraries. And yet, Azure Function users have been waiting for almost two years for DI support. The original request was posted in [2016](https://feedback.azure.com/forums/355860-azure-functions/suggestions/15642447-enable-dependency-injection-in-c-functions), and it wasn't until a few days ago that Microsoft linked it to an open GitHub [issue](https://github.com/Azure/Azure-Functions/issues/299) that has been active since 2017.
 
-I have a project with a large, complex DI-driven library which must be shared between several web apps as well as a variety of services implemented as Azure Function apps. I knew DI wasn't "officially" available and would be a challenge. Since Azure Functions run on top of the older WebJob hosting system, I spent the better part of two days trying to figure out how to achieve DI by wiring up `IServiceCollection` as a WebJob `IJobActivator`. However, it doesn't appear that a Function can reach the underlying WebJob host, which means the activator can't be connected to the `JobHostConfiguration`.
-
-Shortly after concluding the WebJob activator approach was a dead end, I happened to find the GitHub discussion about DI. In that discussion, two users contributed their interesting experiments in Function DI support. Last October, basic DI was accomplished by [BorisWilhelms](https://github.com/BorisWilhelms/azure-function-dependency-injection), but that implementation tightly ties service registration to the rest of the injection system. Just a few days ago, user [yuka1984](https://github.com/yuka1984/azure-function-dependency-injection) forked that project to add an inspired custom Function trigger that moves DI service registration out of the injection system and into the Function app.
+I have a project with a large, complex DI-driven library which must be shared between several web apps as well as a variety of services implemented as Azure Function apps. I knew DI wasn't "officially" available and would be a challenge. I struck paydirt when I found the GitHub discussion about DI. Two users contributed their interesting experiments in Function DI support. Last October, basic DI was accomplished by [BorisWilhelms](https://github.com/BorisWilhelms/azure-function-dependency-injection), but that implementation tightly ties service registration to the rest of the injection system. Just a few days ago, user [yuka1984](https://github.com/yuka1984/azure-function-dependency-injection) forked that project to add an inspired custom Function trigger that moves DI service registration out of the injection system and into the Function app.
 
 I spent some time reviewing their work and realized they were very close to a reusable library. I've done quite a bit of cleanup, commenting, and refactoring of their code, and I made quite a few changes to the code that demonstrates how the different use-cases work, but the basic concept is unchanged and they deserve all the credit for their insights.
 
@@ -145,6 +143,20 @@ There is one unusual side-effect of registering services via Function trigger: t
 
 The implementation of service registration as separate `Lazy<>` instances means each registration Function acts as a completely unique composition root. In fact, an individual Function can even reference multiple registration trigger Functions (ie. more than one composition root), even providing references to the same interface but registered with different lifetimes from other injected references on the same Function. It's hard to imagine a use for this last bit, but the flexibility is certainly interesting.
 
+## // TODO: WebJobs Host JobActivator
+
+There are quite a few examples online of implementing DI for WebJobs. The WebJobs host configuration has a property called `JobActivator` that will perform DI when pointed to a container, which in .NET Core DI is an `IServiceProvider`. I noticed `RegisterServicesTrigger` implements the WebJobs `IExtensionConfigProvider` interface, which requires just one method:
+
+```
+public void Initialize(ExtensionConfigContext context)
+```
+
+The `ExtensionConfigContext` object's `Config` property returns a reference to the `JobHostConfiguration`, which suggests a more direct route to Function DI may be available to us.
+
+I suspect it would work to register a class-level `IFunctionInvocationFilter` and point the activator to the DI provider, creating a composition root for that Function class. (Filters can also be registered at other levels such as globals or individual Functions, so other DI composition techniques should be possible, but as I explained earlier, class-level composition "feels" right.)
+
+I hope to find some time to investigate this later.
+
 ## Conclusion
 
-Thanks to the efforts of BorisWilhelms and yuka1984, we have an easy-to-use, highly flexible, reusable dependency injection library for Azure Function apps. In my opinion, they've handed Azure Function DI to Microsoft on a platter. Hopefully my contributions will prove helpful, and here's hoping we see official DI support soon.
+Thanks to the efforts of BorisWilhelms and yuka1984, we have an easy-to-use, highly flexible, reusable dependency injection library for Azure Function apps. They may have handed Azure Function DI to Microsoft on a platter, although the possibility of a `JobActivator`-based solution is intriguing. Hopefully my contributions will prove helpful, and here's hoping we see some type of official DI support soon!
