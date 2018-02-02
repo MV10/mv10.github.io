@@ -157,6 +157,20 @@ I suspect it would work to register a class-level `IFunctionInvocationFilter` an
 
 I hope to find some time to investigate this later.
 
+## Update: NuGet Packages
+
+Feb-02-2018 Update: When I build libraries I share them to my other apps as local NuGet packages to avoid transient dependency problems. For some reason, a project that depends on the Azure Functions SDK for version 1 (.NET Framework) prevents Visual Studio's automatic package generation from working.
+
+The solution is simple -- remove the reference to `Microsoft.NET.Sdk.Functions` and create references to the individual packages. You'll want to take a look at the package dependencies in your Azure Functions application that will use DI. Version 1.0.7 of the SDK is still stuck on the beta versions shown below, and unfortunately the dependency is version-specific (`=` rather than `>=`) which means you can't reference the release versions yet, even though they've been available for a while (a lot of this Azure stuff has become a modern-day package-based version of DLL Hell). 
+
+| Package | Version |
+| :---
+| `Microsoft.Azure.Webjobs` | `v2.1.0-beta4` |
+| `Microsoft.Azure.WebJobs.Extensions` | `v2.1.0-beta4` |
+| `Microsoft.Azure.WebJobs.Extensions.Http` | `v1.0.0-beta4` |
+
+I've updated the GitHub project accordingly.
+
 ## Conclusion
 
 Thanks to the efforts of BorisWilhelms and yuka1984, we have an easy-to-use, highly flexible, reusable dependency injection library for Azure Function apps. They may have handed Azure Function DI to Microsoft on a platter, although the possibility of a `JobActivator`-based solution is intriguing. Hopefully my contributions will prove helpful, and here's hoping we see some type of official DI support soon!
