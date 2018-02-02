@@ -49,7 +49,7 @@ Although it isn't obvious from looking at the code above, one of the really inte
 
 Since Azure Function apps are only C# class libraries as far as the compiler is concerned, treating the end-result as a library was trivial. I just created a new Function project to act as the "main" project (the one that actually runs Functions) and referenced the DI project from there. After a recompile, the attributes just work.
 
-A useful feature I added is a default registration Function name of `RegisterServices` for the `[Inject]` attribute. Most Function apps will only need a single registration Function, and you'll still have to add the `[FunctionName("RegisterServices")] attribute to the trigger Function for it to work, but the trigger name should help to jog your memory. 
+A useful feature I added is a default registration Function name of `RegisterServices` for the `[Inject]` attribute. Most Function apps will only need a single registration Function, and you'll still have to add the `[FunctionName("RegisterServices")]` attribute to the trigger Function for it to work, but the trigger name should help to jog your memory. 
 
 ## Verifying Full-Graph Injection
 
@@ -113,7 +113,7 @@ To show this, I created scoped and non-scoped variants along with an `IGreeterCo
 
 These demonstrations are simple, but a real-world class library is likely to have extensive and complex dependencies. It isn't realistic to expect library-consumers to understand and register them correctly. Anyone who uses ASP.NET MVC or Core will recognize the many `services.Add` commands, which is an example of the solution to this problem. I added the same type of registration extensions that service-consumers can rely upon to ensure all the necessary interfaces are registered for injection.
 
-For the Function DI demonstration project, the `GreeterInjectionExtensions` class which provides three methods to register `IGreeter` as singleton, transient, or scoped lifetimes. The `IGreeterConsumer` registration extension only supports transient registration since that's all the demo requires.
+For the Function DI demonstration project, the `GreeterInjectionExtensions` class provides three methods to register `IGreeter` as singleton, transient, or scoped lifetimes. The `IGreeterConsumer` registration extension only supports transient registration since that's all the demo requires.
 
 For my real-world class library, I have to consider many different use-cases. Web applications have broad coverage and a relatively long lifecycle, and so it is appropriate to provide a heavyweight, one-time-startup registration which literally registers the entire library. However, Azure Function apps have very different needs, so it was expedient to create additional extension methods specific to each utility service or even individual Functions, pulling in only the library interfaces required by those scenarios.
 
@@ -121,7 +121,7 @@ For my real-world class library, I have to consider many different use-cases. We
 
 Earlier I mentioned that I didn't like the way service registration was tightly tied to the rest of the DI code in the original example from BorisWilhelms. When I first reviewed yuka1984's changes, I also initially questioned service registration localized to the Function class. 
 
-I spent a few hours considering ways to move registration to a separate class within the Function app, similar to the way ASP.NET Core relies upon `Startup.cs` to register services. However, executing a Function in another class turns out to be very complicated (and maybe impossible) in a Function app. The class `RegisterServicesTrigger` has a method called `AddConfigExecutor` which is defines the `Lazy<>` reference to the configuration Function. In the source, you'll find the following line of code:
+I spent a few hours considering ways to move registration to a separate class within the Function app, similar to the way ASP.NET Core relies upon `Startup.cs` to register services. However, executing a Function in another class turns out to be very complicated (and maybe impossible) in a Function app. The class `RegisterServicesTrigger` has a method called `AddConfigExecutor` which defines the `Lazy<>` reference to the configuration Function. In the source, you'll find the following line of code:
 
 ```
 executor.TryExecuteAsync(
