@@ -12,17 +12,19 @@ We show how to turn an Azure Function dependency injection experiment into a reu
 
 Code for this article can be found [here](https://github.com/MV10/Azure.Functions.Dependency.Injection).
 
-Dependency injection has become a defacto standard technique for writing testable, loosely-coupled applications and libraries. And yet, Azure Function users have been waiting for almost two years for DI support. The original feedback was posted in [2016](https://feedback.azure.com/forums/355860-azure-functions/suggestions/15642447-enable-dependency-injection-in-c-functions), and it wasn't until a few days ago that Microsoft linked it to an open GitHub [issue](https://github.com/Azure/Azure-Functions/issues/299) that has been open since 2017.
+Dependency injection has become a standard technique for writing testable, loosely-coupled applications and libraries. And yet, Azure Function users have been waiting for almost two years for DI support. The original request was posted in [2016](https://feedback.azure.com/forums/355860-azure-functions/suggestions/15642447-enable-dependency-injection-in-c-functions), and it wasn't until a few days ago that Microsoft linked it to an open GitHub [issue](https://github.com/Azure/Azure-Functions/issues/299) that has been active since 2017.
 
-I have a project with a large, complex DI-driven library which must be shared between several web apps and some utilities that will be deployed as a handful of Azure Function apps. I knew DI was going to be a challenge. Since Azure Functions run on top of the older WebJob hosting system, I spent the better part of two days trying to figure out how to achieve DI by wiring up `IServiceCollection` as a WebJob `IJobActivator`. However, it doesn't appear that a Function can reach the underlying WebJob host, which means the activator can't be connected to the `JobHostConfiguration`.
+I have a project with a large, complex DI-driven library which must be shared between several web apps as well as a variety of services implemented as Azure Function apps. I knew DI wasn't "officially" available and would be a challenge. Since Azure Functions run on top of the older WebJob hosting system, I spent the better part of two days trying to figure out how to achieve DI by wiring up `IServiceCollection` as a WebJob `IJobActivator`. However, it doesn't appear that a Function can reach the underlying WebJob host, which means the activator can't be connected to the `JobHostConfiguration`.
 
-Shortly after concluding the WebJob activator approach was a dead end, I happened to find the GitHub discussion. In that discussion, two users contributed their interesting experiments in Function DI support. Last October, basic DI was accomplished by [BorisWilhelms](https://github.com/BorisWilhelms/azure-function-dependency-injection), but that implementation tightly tied the injection system to service registration. Just a few days ago, user [yuka1984](https://github.com/yuka1984/azure-function-dependency-injection) forked that project to add an inspired custom Function trigger that moves DI service registration out of the injection system and into the Function app.
+Shortly after concluding the WebJob activator approach was a dead end, I happened to find the GitHub discussion about DI. In that discussion, two users contributed their interesting experiments in Function DI support. Last October, basic DI was accomplished by [BorisWilhelms](https://github.com/BorisWilhelms/azure-function-dependency-injection), but that implementation tightly ties service registration to the rest of the injection system. Just a few days ago, user [yuka1984](https://github.com/yuka1984/azure-function-dependency-injection) forked that project to add an inspired custom Function trigger that moves DI service registration out of the injection system and into the Function app.
 
-I spent some time reviewing their work and realized they were very close to a reusable library. I've done quite a bit of cleanup and refactoring of their code, and I made quite a few changes to the code that demonstrates how the different use-cases work, but the basic concept is unchanged and they deserve all the credit for their insights.
+I spent some time reviewing their work and realized they were very close to a reusable library. I've done quite a bit of cleanup, commenting, and refactoring of their code, and I made quite a few changes to the code that demonstrates how the different use-cases work, but the basic concept is unchanged and they deserve all the credit for their insights.
 
 ## Using the Attributes
 
 Azure Functions are `static` classes, which makes them incompatible with the normal constructor-based DI. BorisWilhelms' solution was to create an `[Inject]` attribute which can be applied to Function parameters to declare dependencies. From there, yuka1984 created an injection-configuration custom Function trigger and changed the `[Inject]` attribute to also reference the function that registers the DI services. 
+
+Injection configuration is triggered by the injection request.
 
 The result is very easy to use.
 
@@ -45,15 +47,15 @@ public static class DemoFunction
 }
 ```
 
-Although it isn't obvious from looking at the code above, one of the really interesting ideas in yuka1984's solution is to use a `Lazy<>` approach to trigger activation. Thus, the registration is not actually processed until it is used, and the registration is only processed once.
+Although it isn't obvious from looking at the code above, one of the really interesting ideas in yuka1984's solution is to use a `Lazy<>` approach to activation of the trigger Function. Thus, service registration is not actually processed until it is used, and it is only processed once regardless of how many `[Inject]` tags reference it.
 
-Since Azure Function apps are really just C# class libraries as far as Visual Studio is concerned, treating the end-result as a library was trivial. I just created a new Function project to act as the "main" project (the one that actually runs Functions) and referenced the DI project. After a recompile, the attributes just work.
+Since Azure Function apps are only C# class libraries as far as the compiler is concerned, treating the end-result as a library was trivial. I just created a new Function project to act as the "main" project (the one that actually runs Functions) and referenced the DI project from there. After a recompile, the attributes just work.
 
 ## Verifying Full-Graph Injection
 
-Since my real-world use-case is a large, complex, DI-dependent utility library, I modified their demo code to demonstrate to my own satisfaction that dependencies declared by the injected objects would also be correctly resolved. I also made a change I felt better demonstrated the different service lifetimes.
+Since my real-world use-case is a large, complex, DI-dependent utility library, I modified their demo code to demonstrate to my own satisfaction that dependencies declared by the injected objects would also be correctly resolved. I also made changes I felt better demonstrated the different service lifetimes.
 
-In yuka1984's version of the demo `IGreeter` service, he thoughtfully added a counter to demonstrate that the `AddSingleton` registration was really exhibiting singleton behavior. My modification was to simply create an `ICounter` which gets injected into the concrete `CountUpGreeter` class, and sure enough, at runtime the correct dependencies are injected even in the separate class library.
+The original demos used an `IGreeter` interface and classes to demonstrate injection. I moved these to a separate .NET Standard library project. In yuka1984's version of the demo, he thoughtfully added a counter one of the `IGreeter` implementations to demonstrate that the `AddSingleton` registration was really exhibiting singleton behavior. My modification was to simply add `ICounter` which is injected into the concrete `CountUpGreeter` class.
 
 ```
 public class Counter : ICounter
@@ -66,16 +68,14 @@ public class CountUpGreeter : AGreeter, IGreeter
 {
     private readonly ICounter counter;
     public CountUpGreeter(ICounter counter) : base()
-    {
-        this.counter = counter;
-    }
+        => this.counter = counter;
 
     public new string Greet()
-    {
-        return $"Hello World, counter {counter.count++}, created {constructed}";
-    }
+        => $"Hello World, counter {counter.count++}, ms:{constructed.Milliseconds}";
 }
 ```
+
+A quick test shows the counter works, confirming that DI carries through to referenced members of the separate class library.
 
 ## Demonstrating Singleton Services
 
@@ -89,7 +89,7 @@ You can see there are two singleton URLs. Calling each of these proves they do i
 
 ## Demonstrating Transient Services
 
-Services with a transient lifetime are even defined by the [documentation](https://docs.microsoft.com/en-us/aspnet/core/fundamentals/dependency-injection#service-lifetimes-and-registration-options) as great choices for the kind of services Function apps are meant to provide.
+I was surprised that neither version of the DI experiments demonstrated transient registration. Transient services are even defined by the [documentation](https://docs.microsoft.com/en-us/aspnet/core/fundamentals/dependency-injection#service-lifetimes-and-registration-options) as great choices for the kind of services Function apps are meant to provide.
 
 > Transient lifetime services are created each time they're requested. This lifetime works best for lightweight, stateless services.
 
@@ -103,7 +103,7 @@ The documentation says this about registering with `AddScoped`:
 
 > Scoped lifetime services are created once per request.
 
-Unfortunately yuka1984's scoped demonstration didn't actually demonstrate scoped behavior. It did register `IGreeter` using `AddScoped` but that alone won't prove that the service is created once per request. To do this, some other service would have to be registered which also injected `IGreeter` during the same request. When `IGreeter` is registered as scoped, both injected services will show the same `constructed` millisecond timestamp from their references to `IGreeter`, but should `IGreeter` be registered as transient, each service will receive a new copy of `IGreeter` and exhibit different timestamps.
+Unfortunately yuka1984's scoped demonstration didn't illustrate the effects of a scoped lifetime. It did register `IGreeter` using `AddScoped` but that alone won't prove that the service is created once per request. To do this, some other service would have to be registered which also injected `IGreeter` during the same request. When `IGreeter` is registered as scoped, both injected services will show the same `constructed` millisecond timestamp from their references to `IGreeter`, but should `IGreeter` be registered as transient, each service will receive a new copy of `IGreeter` and exhibit different timestamps.
 
 To show this, I created scoped and non-scoped variants along with an `IGreeterConsumer` service (which is always registered as transient; its lifecycle isn't relevant, only the lifecycle of the `IGreeter` upon which it depends). You may have to run the non-scoped version a few times before you get different timestamps, it's possible for both instances to be created within the same millisecond.
 
@@ -111,15 +111,15 @@ To show this, I created scoped and non-scoped variants along with an `IGreeterCo
 
 ## Service Registration Helpers
 
-These demonstrations are relatively simple, but in a real-world class library, the dependencies may be extensive and difficult for library-consumers to understand and register. Because of this, I prefer to create registration extensions that service-consumers can rely upon to ensure all the necessary interfaces are registered for injection. Anyone who uses ASP.NET Core will recognize the many `services.Add` commands, which are an example of this same approach.
+These demonstrations are simple, but a real-world class library is likely to have extensive and complex dependencies. It isn't realistic to expect library-consumers to understand and register them correctly. Anyone who uses ASP.NET MVC or Core will recognize the many `services.Add` commands, which is an example of the solution to this problem. I added the same type of registration extensions that service-consumers can rely upon to ensure all the necessary interfaces are registered for injection.
 
-For the Function DI demonstration project, I've created a `GreeterInjectionExtensions` class which provides three methods to register `IGreeter` as singleton, transient, or scoped lifetimes. The `IGreeterConsumer` registration extension only supports transient registration since that's all the demonstration requires.
+For the Function DI demonstration project, the `GreeterInjectionExtensions` class which provides three methods to register `IGreeter` as singleton, transient, or scoped lifetimes. The `IGreeterConsumer` registration extension only supports transient registration since that's all the demo requires.
 
-For my real-world class library, I have to consider different use-cases. Web applications have broad coverage and a relatively long lifecycle, and so it is appropriate to provide a registration extension which literally registers the entire library. However, Azure Function apps have very different needs, so it was expedient to create additional extensions specific to each use-case, pulling in only the library interfaces required by those scenarios.
+For my real-world class library, I have to consider many different use-cases. Web applications have broad coverage and a relatively long lifecycle, and so it is appropriate to provide a heavyweight, one-time-startup registration which literally registers the entire library. However, Azure Function apps have very different needs, so it was expedient to create additional extension methods specific to each utility service or even individual Functions, pulling in only the library interfaces required by those scenarios.
 
 ## The Right Place to Register Services
 
-Earlier I mentioned that I didn't like the way service registration was tightly tied to the rest of the dependency code in the original example from BorisWilhelms. When I first reviewed yuka1984's changes, I also initially questioned service registration within the Function class. 
+Earlier I mentioned that I didn't like the way service registration was tightly tied to the rest of the DI code in the original example from BorisWilhelms. When I first reviewed yuka1984's changes, I also initially questioned service registration localized to the Function class. 
 
 I spent a few hours considering ways to move registration to a separate class within the Function app, similar to the way ASP.NET Core relies upon `Startup.cs` to register services. However, executing a Function in another class turns out to be very complicated (and maybe impossible) in a Function app. The class `InjectorConfigTrigger` has a method called `AddConfigExecutor` which is defines the `Lazy<>` reference to the configuration Function. In the source, you'll find the following line of code:
 
@@ -133,16 +133,16 @@ That causes the WebJob library to execute a Function. `TriggeredFunctionData` op
 
 Fortunately, after thinking about it for awhile, I've concluded that service registration within each Function class is a good fit for the Function application model.
 
-As mentioned in the previous section, when a web application uses my utility library, there is a good chance most of the library will be used at some point. It is reasonable to just register everything in one shot. The web application runtime model is relatively loose about memory usage and in comparison to the default five-minute maximum Function lifecycle, a web application hangs around for a very long time.
+As mentioned in the previous section, when a web application uses my utility library, there is a good chance most of the library will be used at some point. It is reasonable to just register everything in one shot. The web application runtime model is relatively loose about memory usage and in comparison to the default five-minute maximum Function lifecycle, a web application can remain active in memory for many hours.
 
-On the other hand, Functions are meant to be very self-contained and very memory- and processing-efficient. These concerns should be reflected in the dependencies the Functions require and how related services are registered. Therefore, it makes sense to me that service registration should also be relatively localized to the Function itself. Yes, it is still important for the library to provide helpers so that the Function isn't too tightly tied to internal library dependency requirements, but registrations should be kept as streamlined as possible.
+On the other hand, Functions are meant to be very self-contained and very memory- and processing-efficient. These concerns should be reflected in the dependencies the Functions require and how related services are registered. Therefore, it makes sense to me that service registration should also be localized to the Function's class. Yes, it is still important for the library to provide helpers so that the Function isn't too tightly tied to internal library requirements, but registrations should be kept as streamlined as possible.
 
 ## Multiple Composition Roots
 
-There is one unusual side-effect of this trigger-based injection configuration: the application effectively has multiple [composition roots](http://blog.ploeh.dk/2011/07/28/CompositionRoot/). Normally, an application registers services once at startup. But the nano-service orientation of a Function application means that each invocation of the application potentially has different, very tightly-constrained requirements. As a result, a Function app which provides several logically-related services may have very different runtime requirements.
+There is one unusual side-effect of registering services via Function trigger: the application effectively has multiple [composition roots](http://blog.ploeh.dk/2011/07/28/CompositionRoot/). Normally, an application registers services once at startup. But the nano-service orientation of a Function application means that each invocation of the application potentially has different, very tightly-constrained requirements. As a result, a Function app which provides several logically-related services may have very different runtime requirements.
 
-The implementation of service registration as separate `Lazy<>` instances means each registration Function acts as a completely unique composition root. In fact, a single Function can reference more than one registration trigger Function (or if you prefer, more than one composition root), even providing references to the same interface but registered with different lifetimes from other injected references on the same Function. It's hard to imagine a use for this last bit, but the flexibility is certainly interesting.
+The implementation of service registration as separate `Lazy<>` instances means each registration Function acts as a completely unique composition root. In fact, an individual Function can even reference multiple registration trigger Functions (ie. more than one composition root), even providing references to the same interface but registered with different lifetimes from other injected references on the same Function. It's hard to imagine a use for this last bit, but the flexibility is certainly interesting.
 
 ## Conclusion
 
-Thanks to the efforts of BorisWilhelms and yuka1984, we have an easy-to-use, highly flexible, reusable dependency injection library for Azure Function apps. In my opinion, they've handed Function DI to Microsoft on a platter. Here's hoping we see official support soon.
+Thanks to the efforts of BorisWilhelms and yuka1984, we have an easy-to-use, highly flexible, reusable dependency injection library for Azure Function apps. In my opinion, they've handed Azure Function DI to Microsoft on a platter. Hopefully my contributions will prove helpful, and here's hoping we see official DI support soon.
