@@ -20,7 +20,7 @@ Azure Functions are challenging in this respect because their `static` nature is
 
 The safe-release technique is simple enough to describe in one sentence: Hook the `ProcessExit` event.
 
-Note that the code in this article is from a real library I'm working with, so the examples use constructor-based dependency injection and interfaces for DI service registration. You can read more about a DI technique for Azure Functions in an earlier article I wrote recently, [Reusable Dependency Injection for Azure Function Apps]({{ site.baseurl }}{% post_url 2018-02-01-reusable-dependency-injection-azure-function %}).
+The code in this article is based upon a real library I'm working with, so the examples use constructor-based dependency injection and interfaces for DI service registration. You can read more about a DI technique for Azure Functions in an earlier article I wrote recently, [Reusable Dependency Injection for Azure Function Apps]({{ site.baseurl }}{% post_url 2018-02-01-reusable-dependency-injection-azure-function %}).
 
 ## Caching a Single Instance
 
@@ -83,17 +83,17 @@ public static async Task Run(
 
 ## Caching Multiple Instances
 
-Some heavyweight resources are not globally reusable. An example of this is the Azure Service Bus `MessageSender` object, each of which is tied to a specific queue or topic after creation. Our application uses many queues, and some Functions can send up to a thousand messages in response to a single initial event, so we definitely don't want to allocate and tear-down these expensive objects over and over again.
+Some heavyweight resources are not globally reusable. An example of this is the Azure Service Bus `MessageSender` object, each of which is tied to a specific queue or topic after creation. Our application uses many queues, and some Functions can send hundreds or even thousand messages in response to a single initial event, so we definitely don't want to allocate and tear-down these expensive objects over and over again.
 
 In this example, we combine the `ProcessExit` approach with a technique I first read about in Andrew Locke's [article](https://andrewlock.net/making-getoradd-on-concurrentdictionary-thread-safe-using-lazy/) last year. This is a thread-safe approach to on-demand instantiation with `Lazy<>` factories stored in a `ConcurrentDictionary`. The use of `Lazy<>` ensures one and only one instance with the desired configuration (in this case, the queue name) will be created regardless of whether multiple clients make overlapping requests for the resource.
 
 ```
 public class MessageSenderCache : IMessageSenderCache
 {
-    private readonly string queueConnectionString;
-    public MessageSenderCache(ILibraryConfig config)
+    private readonly string connect;
+    public MessageSenderCache(IConfigCache config)
     {
-        queueConnectionString = config.QueueSenderConnectionString;
+        connect = config.QueueSenderConnectionString;
         AppDomain.CurrentDomain.ProcessExit += CloseMessageSenders;
     }
 
@@ -106,8 +106,7 @@ public class MessageSenderCache : IMessageSenderCache
         return cache.GetOrAdd(queueName, 
             new Lazy<IMessageSender>(() =>
             {
-                return new MessageSender
-                (queueConnectionString, queueName);
+                return new MessageSender(connect, queueName);
             })).Value;
     }
 
@@ -150,7 +149,7 @@ public static async Task Run(
 
 ## Register with `AddSingleton`
 
-These examples would be easy to convert to a `static` library approach, which is probably how I'd implement them if we were not using the dependency injection extensions in our Functions apps. 
+These examples would be easy to convert to a `static` library approach, which is probably how I'd implement them if we were not using the dependency injection extensions in our Functions apps, and if we didn't have non-Functions dependencies on the libraries. 
 
 If your cachces are injected services, it is important that the services be registered with `AddSingleton`, otherwise you'll incur the very startup overhead you're trying to avoid, and the application will rarely (if ever) correctly release those references.
 
@@ -168,7 +167,7 @@ I've done quite a bit of logging with both Functions and console-based test clie
 
 This technique works for both Azure v1 Functions based on .NET Framework and v2 based on .NET Core. The `AppDomain` APIs were not originally part of .NET Core but Microsoft brought them back as part of the major API expansion in .NET Standard 2.0.
 
-https://apisof.net/catalog/System.AppDomain.ProcessExit
+[https://apisof.net/catalog/System.AppDomain.ProcessExit](https://apisof.net/catalog/System.AppDomain.ProcessExit)
 
 ## Possible Alternative
 
@@ -178,4 +177,4 @@ I haven't tried it yet, but in a pure Functions environment, it may be possible 
 
 ## Conclusion
 
-Safe and efficient caching and cleanup of heavyweight resources is easy once you've familiarized yourself with these techniques. Longer term I'm hoping Microsoft exposes at least minimal lifecycle events to Azure Function apps, but at least we have some alternatives in the interim.
+Safe and efficient caching and cleanup of heavyweight resources is easy once you've familiarized yourself with these techniques. Longer term I'm hoping Microsoft exposes at least minimal lifecycle events to Azure Function apps in some official capacity, but at least we have some alternatives in the interim.
