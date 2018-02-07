@@ -1,5 +1,5 @@
 ---
-title: Serilog Dependency Injection and Easy ASP.NET Core IP Logging
+title: Serilog Dependency Injection and Easy IP Logging
 tags: c# .net asp.net.core serilog dependency.injection
 header:
   image: "/assets/2018/02-07/header1280.png"
