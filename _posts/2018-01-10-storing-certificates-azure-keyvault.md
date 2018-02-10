@@ -15,6 +15,19 @@ This article demonstrates storing and retrieving X.509 certificates to Azure Key
 
 <!--more-->
 
+## Update: Feb 10, 2018
+
+**Data Protection API:** Unfortunately, this technique is not particularly useful for use with the Data Protection API. 
+{: .notice--warning}
+
+It's still a useful technique for X.509 dependencies like Identity Server's token credentials.
+
+Inexplicably, the DPAPI `ProtectKeysWithCertificate` override which accepts an `X509Certificate2` object is able to _encrypt_ sensitive data with the provided certificate, but _decryption_ fails with an `Unable to retrieve the decryption key` exception unless the key is also in the local user's certificate store. This means the override is effectively pointless.
+
+Why? Who knows. Microsoft blows off inquiries with [vague](https://github.com/aspnet/DataProtection/issues/286#issuecomment-348599427) explanations about "underlying framework limitations" (don't they get paid to fix those?), when they don't just close the thread with [no explanation](https://github.com/aspnet/DataProtection/issues/139#issuecomment-301195447) at all.
+
+## Back to the Old Article...
+
 This article will build upon tools and concepts presented in two recent posts:
 
 * [Easy Configuration Sharing with Azure Key Vault]({{ site.baseurl }}{% post_url 2017-12-23-easy-configuration-sharing-with-azure-key-vault %})
@@ -174,6 +187,8 @@ You can see I've also uploaded the IdentityServer4 token credentials using the s
 
 ## Certificate Retrieval
 
+**See update. Returning an `X509Certificate2` object is not useful for DPAPI due to mysterious "framework limitations".**
+
 In an [earlier article]({{ site.baseurl }}{% post_url 2017-12-23-easy-configuration-sharing-with-azure-key-vault %}) we created a couple of helper classes to retrieve and cache Key Vault secrets. We'll modify that project.
 
 First, add this `using` statement to the class:
@@ -218,6 +233,8 @@ Now add the following code at the very top of the `ConfigureServices` method in 
 
 **Important:** Data Protection must be configured **before** the call to `services.AddMvc`. Data Protection is used within `AddMvc` processing, so the correct storage and certificate configuration must be established first.
 {: .notice--warning}
+
+**See update. Returning an `X509Certificate2` object is not useful for DPAPI due to mysterious "framework limitations".**
 
 ```
 var blobAccount = CloudStorageAccount.Parse(GetSecret.StorageConnectionString().GetAwaiter().GetResult());
