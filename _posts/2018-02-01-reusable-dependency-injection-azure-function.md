@@ -123,6 +123,9 @@ For my real-world class library, I have to consider many different use-cases. We
 
 ## The Right Place to Register Services
 
+**Update:** See the Update at the start of the article. In short, you probably should have just one services-registration trigger per `csproj` and this is handled/enforced by the Functions SDK if you rely upon the default `RegisterServices` trigger name. (You could still create multiple registration points by explicitly providing your own non-default names.)
+{: .notice--warning}
+
 Earlier I mentioned that I didn't like the way service registration was tightly tied to the rest of the DI code in the original example from BorisWilhelms. When I first reviewed yuka1984's changes, I also initially questioned service registration localized to the Function class. 
 
 I spent a few hours considering ways to move registration to a separate class within the Function app, similar to the way ASP.NET Core relies upon `Startup.cs` to register services. However, executing a Function in another class turns out to be very complicated (and maybe impossible) in a Function app. The class `RegisterServicesTrigger` has a method called `AddConfigExecutor` which defines the `Lazy<>` reference to the configuration Function. In the source, you'll find the following line of code:
@@ -160,6 +163,9 @@ The `ExtensionConfigContext` object's `Config` property returns a reference to t
 I suspect it would work to register a class-level `IFunctionInvocationFilter` and point the activator to the DI provider, creating a composition root for that Function class. (Filters can also be registered at other levels such as globals or individual Functions, so other DI composition techniques should be possible, but as I explained earlier, class-level composition "feels" right.)
 
 I hope to find some time to investigate this later.
+
+**Update:** I did look into this for another project, and unfortunately, as far as I can tell, the underlying `JobHostConfiguration` is inaccessible once the Functions layer is up and running.
+{: .notice--warning}
 
 ## Update: NuGet Packages
 
