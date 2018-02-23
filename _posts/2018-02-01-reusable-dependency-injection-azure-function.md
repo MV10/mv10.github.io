@@ -10,6 +10,10 @@ We show how to turn an Azure Function dependency injection experiment into a reu
 
 <!--more-->
 
+**Important:** When I originally wrote this, I didn't realie that Azure Function names defined by the `[FunctionName]` attribute are meant to be _global_ at the `csproj` level. That means you should only have one trigger with the default `RegisterServices` name. That actually ends up working well in practice. Since a Functions project should be small and tightly-focused, typically the individual function methods tend to need most or all of the same services anyway. (Shortly after I posted this, Functions 1.0.8 was released and the build will fail on duplicate Function names; I half suspect this article was the reason, one of the pull-request contributors forked this project.)
+{: .notice--warning}
+
+
 Code for this article can be found [here](https://github.com/MV10/Azure.Functions.Dependency.Injection).
 
 Dependency injection has become a standard technique for writing testable, loosely-coupled applications and libraries. And yet, Azure Function users have been waiting for almost two years for DI support. The original request was posted in [2016](https://feedback.azure.com/forums/355860-azure-functions/suggestions/15642447-enable-dependency-injection-in-c-functions), and it wasn't until a few days ago that Microsoft linked it to an open GitHub [issue](https://github.com/Azure/Azure-Functions/issues/299) that has been active since 2017.
