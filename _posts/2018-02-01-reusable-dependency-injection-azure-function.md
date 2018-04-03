@@ -6,13 +6,15 @@ header:
   teaser: "/assets/2018/02-01/header1280.png"
 ---
 
-We show how to turn an Azure Function dependency injection experiment into a reusable library for any Azure Function project.
+We show how to turn an Azure Function dependency injection experiment into a reusable library for any Azure Function V1 project.
 
 <!--more-->
 
-**Important:** When I originally wrote this, I didn't realie that Azure Function names defined by the `[FunctionName]` attribute are meant to be _global_ at the `csproj` level. That means you should only have one trigger with the default `RegisterServices` name. That actually ends up working well in practice. Since a Functions project should be small and tightly-focused, typically the individual function methods tend to need most or all of the same services anyway. (Shortly after I posted this, Functions 1.0.8 was released and the build will fail on duplicate Function names; I half suspect this article was the reason, one of the pull-request contributors forked this project.)
+**Important:** When I originally wrote this, I didn't realize that Azure Function names defined by the `[FunctionName]` attribute are meant to be _global_ at the `csproj` level. That means you should only have one trigger with the default `RegisterServices` name. That actually ends up working well in practice. Since a Functions project should be small and tightly-focused, typically the individual function methods tend to need most or all of the same services anyway. (Shortly after I posted this, Functions 1.0.8 was released and the build will fail on duplicate Function names; I half suspect this article was the reason, one of the pull-request contributors forked this project.)
 {: .notice--warning}
 
+**Functions V2:** The approach in this article only supports .NET Framework-based Azure Functions V1 apps. Microsoft is working on dependency injection support for .NET Core V2 apps, but you can find my interim solution in [this]({{ site.baseurl }}{% post_url 2018-04-03-service-locator-azure-functions-v2 %}) newer article.
+{: .notice--warning}
 
 Code for this article can be found [here](https://github.com/MV10/Azure.Functions.Dependency.Injection).
 

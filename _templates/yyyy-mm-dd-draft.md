@@ -6,9 +6,8 @@ header:
   teaser: "/assets/2018/mm-dd/header1280.png"
 
 # image paths:
-#   publish:      (/assets/2018/mm-dd/pic.jpg)
-#   edit _drafts: (assets/2018/mm-dd/pic.jpg)
-#   edit _post:   (../assets/2018/mm-dd/pic.jpg)
+#   publish:                        (/assets/2018/mm-dd/pic.jpg)
+#   edit from _post or _templates:  (../assets/2018/mm-dd/pic.jpg)
 ---
 
 Initial text that will be excerpted on index page.
