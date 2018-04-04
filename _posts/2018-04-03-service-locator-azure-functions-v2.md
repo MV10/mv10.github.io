@@ -196,7 +196,7 @@ I was pretty happy with this little hack, so I was _very_ disappointed when I hi
 
 ![Error](/assets/2018/04-03/error.png)
 
-If I'm reading the tea leaves correctly, updates to the Visual Studio Extension "Azure Functions and Web Jobs Tools" isn't completely in sync with the Functions V2 runtime releases. I intend to open an issue to ask about this, and I'll update the article if there are any interesting or helpful explanations or tips.
+If I'm reading the tea leaves correctly, updates to the Visual Studio Extension "Azure Functions and Web Jobs Tools" isn't completely in sync with the Functions V2 runtime releases. Update: Confirmed, the extension is currently not in sync. Open Github bug tracking [here](https://github.com/Azure/Azure-Functions/issues/745).
 
 To make another fairly long story short, the solution was to launch the Function app manually from the command-line (is it 1990 yet?) with the [Functions Core Tools CLI](https://github.com/Azure/azure-functions-core-tools). This was sort of annoying since it also required me to install another command-line package manager I've been trying to avoid, namely [`npm`](https://nodejs.org/en/), dragging an unwanted `node.js` installation along with it. Luckily there is an open issue around this, Microsoft recognizes requiring non-node developers find, install, and use a "foreign" packaging tool just for this one dependency is not an optimal experience.
 
