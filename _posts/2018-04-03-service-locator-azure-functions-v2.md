@@ -32,9 +32,9 @@ Sometimes it's easier to just edit the `csproj` files directly, but other times 
 
 | Location | Change |
 | :---
-| `FuncInjector.csproj` | `<TargetFramework>`~~`net461`~~` netstandard20 </TargetFramework>` |
+| `FuncInjector.csproj` | `<TargetFramework>`~~`net461`~~` netstandard2.0 </TargetFramework>` |
 | | update `Microsoft.Azure.Webjobs.*` references to `3.0.0-beta5` |
-| `FunctionProject.csproj` | `<TargetFramework>`~~`net461`~~` netstandard20 </TargetFramework>` |
+| `FunctionProject.csproj` | `<TargetFramework>`~~`net461`~~` netstandard2.0 </TargetFramework>` |
 | | update `Microsoft.NET.Sdk.Functions` reference to `1.0.11` |
 | | remove the `<ItemGroup>` referencing `Microsoft.Csharp` |
 | `GreeterFunction.cs` | change each `Task<HttpResponseMessage` to `Task<IActionResult>` |
