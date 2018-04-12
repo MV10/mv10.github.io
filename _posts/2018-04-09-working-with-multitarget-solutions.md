@@ -40,6 +40,10 @@ You can see the namespaces and class names are the same, but Visual Studio doesn
 
 Unfortunately, that subtle indicator and the ability to list multiple dependencies in Solution Explorer are pretty much the only UI support you'll get in VS 2017 for multi-targeting. The rest of the article explains how to get this working.
 
+Update: As I spend more time working on multi-targeted projects, I keep finding new places where the UI supports this. For example, the `Find All References` window separates search results by target:
+
+![Findallrefs](/assets/2018/04-09/findallrefs.png)
+
 The other code is pretty simple stuff. The `HelloFactory` creates and returns a new `Hello`, and the console programs call that and output the `SayHello` return value, then pause for input. Each `Hello` implements the `IHello` interface, but this isn't strictly necessary, the static `HelloFactory` returns `IHello` but _creates_ with a reference to `Hello`.
 
 ## C# Project or MSBuild?
