@@ -28,7 +28,7 @@ Code for this article can be found on GitHub at [MV10/Serializing.Encapsulated.E
 
 The Microsoft `Enumeration` class is a base implementation from which individual enumeration classes are derived. The class is pretty simple: a numeric `Id` and a corresponding `Name`, a `ToString` override, and some comparison support. If you're familiar with the `enum` keyword, you may know that you can declare the enumeration to store the values as one of several numeric types. This isn't too commonly used, but it's already a limitation imposed by a class that is supposed to bring flexibility. Additionally, there is no reason to restrict enumerations to numeric representations.
 
-As a result, my first deviation from the Microsoft example was to implement the class with generic support for the identifier. I also renamed the `Id` property to `Code` and the `Name` property to `Description`. I also changed the constructor visibility to `public` for reasons that will be explained later.
+As a result, my first deviation from the Microsoft example was to implement the class with generic support for the identifier. I also renamed the `Id` property to `Code` and the `Name` property to `Description`. I changed the constructor visibility to `public` for reasons that will be explained later, and the properties have `protected set` to support deserialization we'll add later.
 
 ```c#
 public class Enumeration<T> : IComparable
@@ -94,11 +94,6 @@ public class EnumYesNo : Enumeration<string>
 
     public EnumYesNo(string code, string description) : base(code, description)
     { }
-
-    public object DeserializeJson(string jsonValue)
-    {
-        return GetAll<EnumYesNo>().Where(n => n.Code.Equals(jsonValue)).FirstOrDefault();
-    }
 }
 ```
 
@@ -117,8 +112,8 @@ public bool IsUndefined => Code.Equals(Undefined.Code);
 Consider how clean this makes the application code.
 
 ```c#
-var EliteStatus = EnumYesNo.FromBool(QueryCustomerEliteStatus());
-CustomerViewModel.IsElite = EliteStatus.Description;
+var EliteStatus = EnumYesNo.FromBool(QueryCustomerIsElite(customerId));
+CustomerViewModel.EliteStatus = EliteStatus.Description;
 if(EliteStatus.IsYes)
 {
     Flight.UpgradeToFirstClass();
@@ -142,7 +137,7 @@ public object DeserializeJson(string jsonValue)
 }
 ```
 
-Since C# is not a ["duck-typed"](https://en.wikipedia.org/wiki/Duck_typing) language, it is necessary to populate generics (like this invocation of `GetAll<T>`) using a static type that is known at runtime. There are ways to avoid this using the new `dynamic` keyword and the underlying DLR, but I didn't want to pull in those dependencies, and they can exhibit performance issues. After just a few minutes I was able to serialize and deserialize my enumeration classes using only the `Code` values, just as the database and mainframe require.
+Since C# is not a ["duck-typed"](https://en.wikipedia.org/wiki/Duck_typing) language, it is necessary to populate generics (like this invocation of `GetAll<T>`) using a static type that is known at runtime. There are ways to avoid this using the new(ish) `dynamic` keyword and the underlying DLR, but I didn't want to pull in those dependencies, and they can exhibit performance issues. After just a few minutes I was able to serialize and deserialize my enumeration classes using only the `Code` values, just as the database and mainframe require.
 
 However, when it came time to define all of my business-domain enumeration classes, cutting/pasting/tweaking this code over and over felt very wrong. It was time to bite the bullet.
 
@@ -150,7 +145,9 @@ However, when it came time to define all of my business-domain enumeration class
 
 Bite the bullet. Silver bullets. Shiny silver. Reflective... Reflection! Get it? I'm a programmer, not a stand-up comic.
 
-The solution was to implement a single deserializer that uses reflection to find a match. But before we look at the reflection code, we'll lay the groundwork to use that code. We'll take a look at the class derived from `JsonConverter`. It implements three methods, and classes that depend upon it reference the converter with a class attribute. The conversion class needs a simple interface which is also shown below.
+The solution was to implement a single deserializer that uses reflection to find a match. Reflection also has a reputation for performance issues but in my experience it isn't nearly as bad as the performance hit from using the DLR. (Virtually all off-the-shelf serialization options rely on reflection, for obvious reasons.)
+
+The class derived from `JsonConverter` implements three methods, and classes that depend upon it reference the converter with a class attribute. The converter needs the dependent classes to implement a simple interface which is also shown below.
 
 ```c#
 public interface IEnumerationJson
@@ -181,7 +178,7 @@ public class EnumerationJsonConverter : JsonConverter
 }
 ```
 
-`ReadJson` just grabs the string value (for EnumYesNo, this would be a "Y" or "N" value), casts the target object as an `IEnumerationJson` type, then passes along the value for processing. All the hard reflection work is done by the implementation code shown in the next section. The same three-step process takes place in the converter's `WriteJson` implementation.
+The converter doesn't do much by itself, the real work is done in the classes that use the converter. `ReadJson` just grabs the string value (for EnumYesNo, this would be a "Y" or "N" value), casts the target object as an `IEnumerationJson` type, then passes along the value for processing by the dependent class. All the hard reflection work is done by the implementation code shown in the next section. The same three-step process takes place in the converter's `WriteJson` implementation.
 
 ## Enumeration Deserializer
 
@@ -192,7 +189,7 @@ Next, we decorate `Enumeration<T>` with the converter attribute, then we tackle 
 public class Enumeration<T> : IEnumerationJson, IComparable
 ```
 
-Next we add the implementations of the two interface methods.
+Next we add the implementations of the two interface methods called by the converter.
 
 ```c#
 public virtual object ReadJson(string jsonValue)
@@ -219,7 +216,15 @@ public virtual string WriteJson()
 
 You can see that the `WriteJson` implementation is trivial -- JSON data is always string data, so we just return the string value of our user-unfriendly `Code` value. But `ReadJson` is another matter.
 
-When `ReadJson` is invoked, `GetType()` will return the derived class, such as `EnumYesNo`. The code retrieves a list of public static declarations. For `EnumYesNo` this list is the static `Yes`, `No`, and `Undefined` instances of the class. It iterates over that list looking for any entries that are of the same derived type. It compares the `WriteJson` output to the value passed in by JSON.NET, and if a match is found, that instance is returned. The call to `Activator.CreateInstance` is the reason our constructors are declared `public` rather than `protected` as in the Microsoft version.
+Crucially, when `ReadJson` is invoked at runtime, `GetType()` will return the _derived_ class such as `EnumYesNo`, rather than the `Enumeration<T>` class where this method is defined. The code retrieves a list of public static declarations. For `EnumYesNo` this list is the static `Yes`, `No`, and `Undefined` instances of the class. It iterates over that list looking for any entries that are of the same derived type. It compares the `WriteJson` output to the value passed in by JSON.NET, and if a match is found, that instance is returned. The call to `Activator.CreateInstance` is the reason our constructors are declared `public` rather than `protected` as in the Microsoft version.
+
+Incidentally, with a little casting, any part of your application could also use this method to turn a raw data value into an enumeration instance.
+
+```c#
+string EliteDataValue = QueryEliteFlag(customerId); // returns Y or N
+var EliteStatus = (EnumYesNo)((IEnumerationJson)EnumYesNo.ReadJson(EliteDataValue));
+// etc...
+``` 
 
 This means each individual encapsulation class doesn't need to handle serialization or deserialization at all. However, by declaring our implementations as `virtual` we can allow any derived class to override this implementation if necessary.
 
