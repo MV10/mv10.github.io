@@ -8,6 +8,7 @@ gems:
   - jekyll-paginate
   - jekyll-gist
   - jekyll-feed
+  - jekyll-include-cache
 
 timezone: America/New_York
 future: true
