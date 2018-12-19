@@ -41,23 +41,23 @@ Of greater interest is the XML to be stored:
 
 ```xml
 <order>
-	<customer />
-	<orderdate />
-	<items>
-		<item>
-			<sku />
-			<description />
-			<quantity />
-			<price />
-		</item>
-	</items>
-	<shipping>
-		<shipping>
-			<priority />
-			<deliveryest />
-			<shipdate />
-		</shipping>
-	</shipping>
+    <customer />
+    <orderdate />
+    <items>
+        <item>
+            <sku />
+            <description />
+            <quantity />
+            <price />
+        </item>
+    </items>
+    <shipping>
+        <shipping>
+            <priority />
+            <deliveryest />
+            <shipdate />
+        </shipping>
+    </shipping>
 </order>
 ```
 
@@ -69,11 +69,11 @@ The only other change to complete this scenario is to URL-encode the inner `<shi
 
 ```xml
 <shipping>
-	&lt;shipping&gt;
-		&lt;priority&gt;&lt;/priority&gt;
-		&lt;deliveryest&gt;&lt;/deliveryest&gt;
-		&lt;shipdate&gt;&lt;/shipdate&gt;
-	&lt;/shipping&gt;
+    &lt;shipping&gt;
+        &lt;priority&gt;&lt;/priority&gt;
+        &lt;deliveryest&gt;&lt;/deliveryest&gt;
+        &lt;shipdate&gt;&lt;/shipdate&gt;
+    &lt;/shipping&gt;
 </shipping>
 ```
 
@@ -101,22 +101,22 @@ Converting that text data to an XML document simply requires using the T-SQL `ca
 select cast(OrderDetails as xml) as OrderDetailsXml from OrderHistory;
 ```
 
-However, the syntax required to _use_ XML fields isn't quite as obvious. We're going to take advantage of a Common Table Expression (CTE) and the `cross apply` statement. The `apply` keyword is basically a `join` statement that supports record sources which `join` does not, including table-valued functions including the XML `nodes` function.
+However, the syntax required to _use_ XML fields isn't quite as obvious. We're going to take advantage of a Common Table Expression (CTE) and the `cross apply` statement. The `apply` keyword is basically a `join` statement that supports record sources which `join` does not, including table-valued functions like the XML `nodes` function.
 
 ```sql
 with 
-	parsedorder (CustomerId, OrderDetailsXml)
-	as (
-		select CustomerId, 
-		cast(OrderDetails as xml) as OrderDetailsXml 
-		from OrderHistory
-	)
+    parsedorder (CustomerId, OrderDetailsXml)
+    as (
+        select CustomerId, 
+        cast(OrderDetails as xml) as OrderDetailsXml 
+        from OrderHistory
+    )
 select
-	CustomerId,
-	orderxml.r.value('(orderdate)[1]', 'date') as OrderDateFromXml
+    CustomerId,
+    orderxml.r.value('(orderdate)[1]', 'date') as OrderDateFromXml
 from 
-	parsedorder
-	cross apply OrderDetailsXml.nodes('//order') orderxml(r)
+    parsedorder
+    cross apply OrderDetailsXml.nodes('//order') orderxml(r)
 order by OrderDateFromXml desc;
 ```
 
@@ -126,7 +126,7 @@ CTEs produce something similar to a view that only exists for the duration of th
 cross apply OrderDetailsXml.nodes('//order') orderxml(r)
 ```
 
-Clearly `OrderDetailsXml` is the strongly-typed XML document we created in the CTE. The `nodes` function is unique to the SQL XML data type. It returns repeated child nodes of the named xpath as a recordset in a process Microsoft refers to as ["shredding"](https://docs.microsoft.com/en-us/sql/t-sql/xml/nodes-method-xml-data-type?view=sql-server-2017). The syntax `orderxml(r)` is meant to represent table(column) -- in this case `//order` is the "column" -- but I tend to use `r` since this behaves more like a root node than a column, in my opinion. In this example, we are working with the `<orderdate>` node, a child of the root `<order>` node:
+Clearly `OrderDetailsXml` is the strongly-typed XML document we created in the CTE. The `nodes` function is unique to the SQL XML data type. It returns repeated instances of nodes matching xpath expression as a recordset in a process Microsoft refers to as ["shredding"](https://docs.microsoft.com/en-us/sql/t-sql/xml/nodes-method-xml-data-type?view=sql-server-2017). The syntax `orderxml(r)` is meant to represent "table(column)" -- not very clear in this case since the entire document is the "table" and `//order` is the "column". I tend to use `foo(r)` since the "column" part is fixed and this syntax feels more like a root node reference than a "table(column)" relationship, in my opinion. In this example, we are retrieving the `<orderdate>` node, a child of the root `<order>` node:
 
 ```sql
 orderxml.r.value('(orderdate)[1]', 'date') as OrderDateFromXml
@@ -149,31 +149,31 @@ The XML document can contain multiple `<item>` nodes under the `//order/items` p
 
 ```xml
 with 
-	parsedorder (OrderNumber, CustomerId, OrderDetailsXml)
-	as (
-		select OrderNumber, CustomerId, 
-		cast(OrderDetails as xml) as OrderDetailsXml 
-		from OrderHistory
-	)
+    parsedorder (OrderNumber, CustomerId, OrderDetailsXml)
+    as (
+        select OrderNumber, CustomerId, 
+        cast(OrderDetails as xml) as OrderDetailsXml 
+        from OrderHistory
+    )
 select 
-	OrderNumber, 
-	CustomerId,
-	OrderDateFromXml,
-	itemsxml.r.value('(sku)[1]', 'varchar(max)') as ItemSku,
-	itemsxml.r.value('(description)[1]', 'varchar(max)') as ItemDescription,
-	itemsxml.r.value('(quantity)[1]', 'int') as ItemQty,
-	itemsxml.r.value('(price)[1]', 'money') as ItemPrice
+    OrderNumber, 
+    CustomerId,
+    OrderDateFromXml,
+    itemsxml.r.value('(sku)[1]', 'varchar(max)') as ItemSku,
+    itemsxml.r.value('(description)[1]', 'varchar(max)') as ItemDescription,
+    itemsxml.r.value('(quantity)[1]', 'int') as ItemQty,
+    itemsxml.r.value('(price)[1]', 'money') as ItemPrice
 from (
-	select
-		OrderNumber, 
-		CustomerId,
-		orderxml.r.value('(orderdate)[1]', 'date') as OrderDateFromXml,
-		OrderDetailsXml
-	from 
-		parsedorder
-		cross apply OrderDetailsXml.nodes('//order') orderxml(r)
-	) as orderdata
-	cross apply OrderDetailsXml.nodes('//order/items/item') itemsxml(r)
+    select
+        OrderNumber, 
+        CustomerId,
+        orderxml.r.value('(orderdate)[1]', 'date') as OrderDateFromXml,
+        OrderDetailsXml
+    from 
+        parsedorder
+        cross apply OrderDetailsXml.nodes('//order') orderxml(r)
+    ) as orderdata
+    cross apply OrderDetailsXml.nodes('//order/items/item') itemsxml(r)
 order by OrderDateFromXml desc;
 ```
 
@@ -192,11 +192,11 @@ Earlier we noted that aliased columns are only avaialble to the `order by` claus
 ```sql
 with ...
 select 
-	itemsxml.r.value('(quantity)[1]', 'int') as ItemQty,
-	itemsxml.r.value('(price)[1]', 'money') as ItemPrice,
+    itemsxml.r.value('(quantity)[1]', 'int') as ItemQty,
+    itemsxml.r.value('(price)[1]', 'money') as ItemPrice,
    
-	-- parsing fails with two "Invalid column name" errors
-	(ItemQty * ItemPrice) as LineTotal
+    -- parsing fails with two "Invalid column name" errors
+    (ItemQty * ItemPrice) as LineTotal
 from ...
 ```
 
@@ -204,36 +204,36 @@ The solution is _another_ sub-select:
 
 ```sql
 with 
-	parsedorder (OrderNumber, CustomerId, OrderDetailsXml)
-	as (
-		select OrderNumber, CustomerId, 
-		cast(OrderDetails as xml) as OrderDetailsXml 
-		from OrderHistory
-	)
+    parsedorder (OrderNumber, CustomerId, OrderDetailsXml)
+    as (
+        select OrderNumber, CustomerId, 
+        cast(OrderDetails as xml) as OrderDetailsXml 
+        from OrderHistory
+    )
 select 
-	*,
-	(ItemQty * ItemPrice) as LineTotal
+    *,
+    (ItemQty * ItemPrice) as LineTotal
 from (
-	select 
-		OrderNumber, 
-		CustomerId,
-		OrderDateFromXml,
-		itemsxml.r.value('(sku)[1]', 'varchar(max)') as ItemSku,
-		itemsxml.r.value('(description)[1]', 'varchar(max)') as ItemDescription,
-		itemsxml.r.value('(quantity)[1]', 'int') as ItemQty,
-		itemsxml.r.value('(price)[1]', 'money') as ItemPrice
-	from (
-		select
-			OrderNumber, 
-			CustomerId,
-			orderxml.r.value('(orderdate)[1]', 'date') as OrderDateFromXml,
-			OrderDetailsXml
-		from 
-			parsedorder
-			cross apply OrderDetailsXml.nodes('//order') orderxml(r)
-		) as orderdata
-		cross apply OrderDetailsXml.nodes('//order/items/item') itemsxml(r)
-	) as orderdata
+    select 
+        OrderNumber, 
+        CustomerId,
+        OrderDateFromXml,
+        itemsxml.r.value('(sku)[1]', 'varchar(max)') as ItemSku,
+        itemsxml.r.value('(description)[1]', 'varchar(max)') as ItemDescription,
+        itemsxml.r.value('(quantity)[1]', 'int') as ItemQty,
+        itemsxml.r.value('(price)[1]', 'money') as ItemPrice
+    from (
+        select
+            OrderNumber, 
+            CustomerId,
+            orderxml.r.value('(orderdate)[1]', 'date') as OrderDateFromXml,
+            OrderDetailsXml
+        from 
+            parsedorder
+            cross apply OrderDetailsXml.nodes('//order') orderxml(r)
+        ) as orderdata
+        cross apply OrderDetailsXml.nodes('//order/items/item') itemsxml(r)
+    ) as orderdata
 order by OrderDateFromXml desc;
 ```
 
@@ -247,32 +247,32 @@ Prior this, we've only returned data from the XML document, but the same `value`
 
 ```sql
 with 
-	parsedorder (OrderNumber, CustomerId, OrderDetailsXml)
-	as (
-		select OrderNumber, CustomerId, 
-		cast(OrderDetails as xml) as OrderDetailsXml 
-		from OrderHistory
-	)
+    parsedorder (OrderNumber, CustomerId, OrderDetailsXml)
+    as (
+        select OrderNumber, CustomerId, 
+        cast(OrderDetails as xml) as OrderDetailsXml 
+        from OrderHistory
+    )
 select 
-	OrderNumber, 
-	CustomerId,
-	OrderDateFromXml,
-	itemsxml.r.value('(sku)[1]', 'varchar(max)') as ItemSku,
-	itemsxml.r.value('(description)[1]', 'varchar(max)') as ItemDescription,
-	itemsxml.r.value('(quantity)[1]', 'int') as ItemQty
+    OrderNumber, 
+    CustomerId,
+    OrderDateFromXml,
+    itemsxml.r.value('(sku)[1]', 'varchar(max)') as ItemSku,
+    itemsxml.r.value('(description)[1]', 'varchar(max)') as ItemDescription,
+    itemsxml.r.value('(quantity)[1]', 'int') as ItemQty
 from (
-	select
-		OrderNumber, 
-		CustomerId,
-		orderxml.r.value('(orderdate)[1]', 'date') as OrderDateFromXml,
-		OrderDetailsXml
-	from 
-		parsedorder
-		cross apply OrderDetailsXml.nodes('//order') orderxml(r)
-	) as orderdata
-	cross apply OrderDetailsXml.nodes('//order/items/item') itemsxml(r)
+    select
+        OrderNumber, 
+        CustomerId,
+        orderxml.r.value('(orderdate)[1]', 'date') as OrderDateFromXml,
+        OrderDetailsXml
+    from 
+        parsedorder
+        cross apply OrderDetailsXml.nodes('//order') orderxml(r)
+    ) as orderdata
+    cross apply OrderDetailsXml.nodes('//order/items/item') itemsxml(r)
 where
-	itemsxml.r.value('(sku)[1]', 'varchar(max)') = 'A12345'
+    itemsxml.r.value('(sku)[1]', 'varchar(max)') = 'A12345'
 order by OrderDateFromXml desc;
 ```
 
@@ -286,18 +286,18 @@ Let's turn our attention to the second challenge -- processing data supplied by 
 
 ```sql
 with 
-	parsedorder (OrderNumber, OrderDetailsXml)
-	as (
-		select OrderNumber, 
-		cast(OrderDetails as xml) as OrderDetailsXml 
-		from OrderHistory
-	)
+    parsedorder (OrderNumber, OrderDetailsXml)
+    as (
+        select OrderNumber, 
+        cast(OrderDetails as xml) as OrderDetailsXml 
+        from OrderHistory
+    )
 select
-	OrderNumber,
-	orderxml.r.value('(shipping)[1]', 'varchar(max)') as ShippingDetails
+    OrderNumber,
+    orderxml.r.value('(shipping)[1]', 'varchar(max)') as ShippingDetails
 from 
-	parsedorder
-	cross apply OrderDetailsXml.nodes('//order') orderxml(r);
+    parsedorder
+    cross apply OrderDetailsXml.nodes('//order') orderxml(r);
 ```
 
 Similar to the raw `OrderDetails` column itself, it _looks_ like XML but this is actually just text:
@@ -326,28 +326,28 @@ This time, instead of a sub-select, we'll use a pair of CTEs. The first CTE is t
 
 ```sql
 with 
-	outerxml (OrderNumber, CustomerId, OrderDetailsXml)
-	as (
-		select OrderNumber, CustomerId,  
-		cast(OrderDetails as xml) as OrderDetailsXml
-		from OrderHistory
-	),
-	parsedorder (OrderNumber, CustomerId, OrderDetailsXml, ShippingXml)
-	as (
-		select OrderNumber, CustomerId, OrderDetailsXml, 
-		cast(o.r.value('(shipping)[1]', 'varchar(max)') as xml) as ShippingXml
-		from outerxml
-		cross apply OrderDetailsXml.nodes('//order') as o(r)
-	)
+    outerxml (OrderNumber, CustomerId, OrderDetailsXml)
+    as (
+        select OrderNumber, CustomerId,  
+        cast(OrderDetails as xml) as OrderDetailsXml
+        from OrderHistory
+    ),
+    parsedorder (OrderNumber, CustomerId, OrderDetailsXml, ShippingXml)
+    as (
+        select OrderNumber, CustomerId, OrderDetailsXml, 
+        cast(o.r.value('(shipping)[1]', 'varchar(max)') as xml) as ShippingXml
+        from outerxml
+        cross apply OrderDetailsXml.nodes('//order') as o(r)
+    )
 select
-	OrderNumber, 
-	CustomerId,
-	orderxml.r.value('(orderdate)[1]', 'date') as OrderDate,
-	shipping.r.value('(deliveryest)[1]', 'date') as DeliveryEstimate
+    OrderNumber, 
+    CustomerId,
+    orderxml.r.value('(orderdate)[1]', 'date') as OrderDate,
+    shipping.r.value('(deliveryest)[1]', 'date') as DeliveryEstimate
 from 
-	parsedorder
-	cross apply OrderDetailsXml.nodes('//order') orderxml(r)
-	cross apply ShippingXml.nodes('//shipping') shipping(r)
+    parsedorder
+    cross apply OrderDetailsXml.nodes('//order') orderxml(r)
+    cross apply ShippingXml.nodes('//shipping') shipping(r)
 order by OrderDate desc;
 ```
 
@@ -363,39 +363,39 @@ When working with CTEs in particular, limit the amount of data being processed b
 
 ```sql
 with 
-	outerxml (OrderNumber, OrderDate, OrderDetailsXml)
-	as (
-		select OrderNumber, CAST(OrderDate as date),  
-		cast(OrderDetails as xml) as OrderDetailsXml
-		from OrderHistory
-		where OrderDate > '2018-11-30'
-	),
-	parsedorder (OrderNumber, OrderDate, OrderDetailsXml, ShippingXml)
-	as (
-		select OrderNumber, OrderDate, OrderDetailsXml, 
-		cast(o.r.value('(shipping)[1]', 'varchar(max)') as xml) as ShippingXml
-		from outerxml
-		cross apply OrderDetailsXml.nodes('//order') as o(r)
-	)
+    outerxml (OrderNumber, OrderDate, OrderDetailsXml)
+    as (
+        select OrderNumber, CAST(OrderDate as date),  
+        cast(OrderDetails as xml) as OrderDetailsXml
+        from OrderHistory
+        where OrderDate > '2018-11-30'
+    ),
+    parsedorder (OrderNumber, OrderDate, OrderDetailsXml, ShippingXml)
+    as (
+        select OrderNumber, OrderDate, OrderDetailsXml, 
+        cast(o.r.value('(shipping)[1]', 'varchar(max)') as xml) as ShippingXml
+        from outerxml
+        cross apply OrderDetailsXml.nodes('//order') as o(r)
+    )
 select
-	OrderNumber,
-	CustomerId,
-	OrderDate,
-	DeliveryEstimate,
-	DATEADD(day, ShippingPriority, ShipDate) as DeliveryActual
+    OrderNumber,
+    CustomerId,
+    OrderDate,
+    DeliveryEstimate,
+    DATEADD(day, ShippingPriority, ShipDate) as DeliveryActual
 from (
-	select
-		OrderNumber, 
-		OrderDate,
-		orderxml.r.value('(customer)[1]', 'varchar(max)') as CustomerId,
-		shipping.r.value('(priority)[1]', 'int') as ShippingPriority,
-		shipping.r.value('(shipdate)[1]', 'date') as ShipDate,
-		shipping.r.value('(deliveryest)[1]', 'date') as DeliveryEstimate
-	from 
-		parsedorder
-		cross apply OrderDetailsXml.nodes('//order') orderxml(r)
-		cross apply ShippingXml.nodes('//shipping') shipping(r)
-	) as orderdata
+    select
+        OrderNumber, 
+        OrderDate,
+        orderxml.r.value('(customer)[1]', 'varchar(max)') as CustomerId,
+        shipping.r.value('(priority)[1]', 'int') as ShippingPriority,
+        shipping.r.value('(shipdate)[1]', 'date') as ShipDate,
+        shipping.r.value('(deliveryest)[1]', 'date') as DeliveryEstimate
+    from 
+        parsedorder
+        cross apply OrderDetailsXml.nodes('//order') orderxml(r)
+        cross apply ShippingXml.nodes('//shipping') shipping(r)
+    ) as orderdata
 order by OrderDate desc;
 ```
 
@@ -407,10 +407,10 @@ Obviously this is a very contrived example, but the point is the addition of a `
 
 ```sql
 as (
-	select OrderNumber, CAST(OrderDate as date),  
-	cast(OrderDetails as xml) as OrderDetailsXml
-	from OrderHistory
-	where OrderDate > '2018-11-30'
+    select OrderNumber, CAST(OrderDate as date),  
+    cast(OrderDetails as xml) as OrderDetailsXml
+    from OrderHistory
+    where OrderDate > '2018-11-30'
 ),
 ```
 
@@ -420,6 +420,6 @@ Another obvious thing to do in this query is to filter the results so that only 
 
 ## Conclusion
 
-This isn't a common problem, which can make it a bit difficult and time-consuming to figure out how to address it. As these examples show, the solutions to each aspect are variations on a couple of themes. Like so many other programming tasks, it's relatively easy once you know the basic trick.
+This isn't a common problem which can make it difficult and time-consuming to figure out how to address it. As these examples show, the solutions to each aspect are variations on just a couple of themes. Like so many other programming tasks, it's relatively easy once you know the basic trick.
 
 XML has fallen out of favor over the past few years over more human-readable (and -writeable) formats like JSON and YAML, and I can't say I enjoy working with XML any more than most, but it's still a fact of life in the real world. I imagine I'll refer back to this article as notes to myself, and hopefully it'll help others facing similar questions with a delivery deadline to meet.
