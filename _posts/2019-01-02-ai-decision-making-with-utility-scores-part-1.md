@@ -98,7 +98,7 @@ This shape is sometimes referred to as "ease-out" by animators because of the wa
 
 [Interactive Sine Curve](https://www.desmos.com/calculator/iywenft729)
 
-![Sine](/assets/2019/01-03/Sine.png)
+![sine](/assets/2019/01-03/sine.png)
 
 #### CurveCosine
 
@@ -106,7 +106,7 @@ The cosine is simply an out-of-phase sine wave. Animators refer to this as "ease
 
 [Interactive Cosine Curve](https://www.desmos.com/calculator/p9kanbukwd)
 
-![Cosine](/assets/2019/01-03/Cosine.png)
+![cosine](/assets/2019/01-03/cosine.png)
 
 #### CurveLogistic
 
@@ -114,7 +114,7 @@ The logistic curve is one of Dave Mark's favorites (it's in the GDC 2010 video) 
 
 [Interactive Logistic Curve](https://www.desmos.com/calculator/bspslggkhv)
 
-![Logistic](/assets/2019/01-03/Logistic.png)
+![logistic](/assets/2019/01-03/logistic.png)
 
 #### CurveLogit
 
@@ -122,7 +122,7 @@ As Dave remarks in the presentation, a logit curve is a logistic curve turned on
 
 [Interactive Logit Curve](https://www.desmos.com/calculator/fmz1hgplok)
 
-![Logit](/assets/2019/01-03/Logit.png)
+![logit](/assets/2019/01-03/logit.png)
 
 #### CurveSmoothstep
 
@@ -130,7 +130,7 @@ Smoothstep is a very well-known curve in game development and animation circles.
 
 [Smoothstep Curve](https://www.desmos.com/calculator/fmvfxndlff)
 
-![Smoothstep](/assets/2019/01-03/Smoothstep.png)
+![smoothstep](/assets/2019/01-03/smoothstep.png)
 
 #### CurveSmootherstep
 
@@ -138,7 +138,7 @@ Smootherstep is another well-known curve that goes a bit beyond smoothstep. It a
 
 [Smootherstep Curve](https://www.desmos.com/calculator/wanqbm1ygl)
 
-![Smootherstep](/assets/2019/01-03/Smootherstep.png)
+![smootherstep](/assets/2019/01-03/smootherstep.png)
 
 ## Conclusion
 
