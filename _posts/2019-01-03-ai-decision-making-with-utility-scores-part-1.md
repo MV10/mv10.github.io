@@ -1,5 +1,5 @@
 ---
-title: AI Decision-Making with Utility Scores: Part 1
+title: AI Decision-Making with Utility Scores (Part 1)
 tags: c# .net ai utility gamedev
 header:
   image: "/assets/2019/01-03/header1280.jpg"
