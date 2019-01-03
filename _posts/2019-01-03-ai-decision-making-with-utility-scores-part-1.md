@@ -24,6 +24,8 @@ Rather than re-hash the how-and-why of utility theory, I recommend dedicating an
 
 Although it is of less importance to understanding the basic concepts, the same two gentlmenen gave a 2012 GDC presentation called [Embracing the Dark Art of Mathematical Modeling in AI](https://gdcvault.com/play/1015683/Embracing-the-Dark-Art-of). This presentation begins to cover more of the implementation details that were missing from the earlier video, and it approximates much of the architecture you'll see in my Active Imagination library.
 
+There was also an excellent 2015 GCD presentation (same guys!) called [Building a Better Centaur: AI at Massive Scale](https://www.gdcvault.com/play/1021848/Building-a-Better-Centaur-AI). The first two thirds are highly relevant to this topic and comes very close to my Active Imagination architecture. Also well worth your time.
+
 Finally, a third set of articles and presentations by Andrew Fray (posted on his blog as [Context Behaviours Digest](https://andrewfray.wordpress.com/2013/05/15/context-behaviours-digest/) around 2013) discusses a related technique which I prefer to call "Context Steering", although Andrew seems uncertain about the name he prefers. This is pretty interesting material, too, although it's a more specialized type of decision-making and using it requires quite a bit more effort. Context Steering is also supported by my Active Imagination library and I'll save that for a later installment in the series.
 
 A very important take-away from both GDC presentations is that _modeling_ is a critically important part of this process. The simple demo application I'll cover in the second installment implements Dave Mark's example from the 2010 presentation (with a few extra flourishes). Even though I knew what to expect, I admit I was still surprised to see how just a handful of values and possible actions quickly produces interesting and varying behavior. Here's a quick peek:
@@ -42,7 +44,7 @@ Considerations are scored individually by evaluating one or more Context values.
 
 ![elements2](/assets/2019/01-03/elements2.png)
 
-Each Action's Consideration scores are then combined (using an algorithm Dave Marks presented at the 2015 GDC) into a single Action score. These can then be compared to determine the best Action for that group of Context values. Context values, Consideration scores, and Action scores are usually stored as a `float` value normalized to the 0..1 range, which makes it easy to compare and combine them. You can see below that Action 3 has the best score.
+Each Action's Consideration scores are then combined (using an algorithm Dave Marks presents in the 2015 GDC lecture, click the "Compensation Factor" video bookmark) into a single Action score. These can then be compared to determine the best Action for that group of Context values. Context values, Consideration scores, and Action scores are usually stored as a `float` value normalized to the 0..1 range, which makes it easy to compare and combine them. You can see below that Action 3 has the best score.
 
 ![elements3](/assets/2019/01-03/elements3.png)
 
