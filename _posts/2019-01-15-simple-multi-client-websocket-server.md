@@ -18,7 +18,7 @@ In the old days, dumping debug information to the console was disparagingly refe
 
 There are lots of other ways to accomplish similar results, of course. If the data is minimal, stash it into a `List<string>` and dump it to a file. For heavyweight requirements, you could go to extremes and use a plug-in logger like Serilog. But old habits die hard, and I wanted live, console-style output. The next best thing was to send my output to another process, a console-by-proxy.
 
-Back in the 90s I had done interprocess communication using Windows' named pipes feature. I hadn't touched them since they were introduced with .NET 3.5 about ten years ago, but it seemed like a reasonable place to start since I already knew they're simple to set up and use. Unfortunately, I had forgotten just how clumsy they are. Suffice to say I wasn't satisfied with the result, which is why this article is about websockets instead of named pipes. The only other thing I'll say about named pipes is that if you have a burning desire to mess around with them, my [NamedPipesExample](https://github.com/MV10/NamedPipesExample) GitHub repo is probably a good place to start.
+Back in the 90s I had done interprocess communication using Windows' named pipes feature. I hadn't touched them since they were introduced about ten years ago in .NET 3.5, but it seemed like a reasonable place to start since I already had some experience under my belt. Unfortunately, I had forgotten just how clumsy they are. Suffice to say I wasn't satisfied with the result, which is why this article is about websockets instead of named pipes. The only other thing I'll say about named pipes is that if you have a burning desire to mess around with them, my [NamedPipesExample](https://github.com/MV10/NamedPipesExample) GitHub repo is probably a good place to start.
 
 If websockets are kind of old news by this point, named pipes are positively ancient. In spite of both being around for quite awhile, I was surprised by the lack of "functional" examples. There is plenty of code out there that _works,_ but the examples never seem to do anything in a realistic fashion. Very infrequently, the opposite problem applies -- I want an example, not the source for a full-blown production-quality application. I can write all kinds of code that compiles and runs, but Doing Useful Stuff is the name of the game, and apparently striking that balance when writing sample code is more difficult than it seems.
 
@@ -28,15 +28,15 @@ Before we dig in, I'll mention that all of the code for this article can be foun
 
 Probably the best websocket example I found online was from Microsoft's own Paul Batum. Back in 2011, he [blogged](http://www.paulbatum.com/2011/10/getting-to-know-systemnetwebsockets.html) about them, accompanied by [code](http://paulbatum.github.io/WebSocket-Samples/HttpListenerWebSocketEcho/) that included decent comments in a unique side-by-side presentation. The projects I'll present are loosely based on his code. And to be clear, I'm not saying his was a "bad" example (in fact [this guy](https://www.c-sharpcorner.com/UploadFile/bhushanbhure/websocket-server-using-httplistener-and-client-with-client/) liked it so much he appears to have straight-up hijacked the code for his own "article" on the topic). But it suffers from the problem I mentioned above: it works, but it isn't very clear how to turn it into something _useful._ And the worst part is that making it useful is pretty easy.
 
-The most common websocket sample project is an echo server -- anything the server receives is sent back to the same client. Paul's example worked this way, and so do the two I present here. That in itself isn't particularly useful except that it covers send and receive at both ends of the pipe. But every example I found had the same major limitation: the server could only handle a single client. A few examples couldn't even do this -- the server could only handle a single receive/echo cycle.
+The most common websocket demo is an echo server -- anything the server receives is sent back to the same client. Paul's example worked this way, and so do the two examples I present here. That in itself isn't particularly useful except that it covers send and receive at both ends of the pipe. But every example I found had the same major limitation: the server could only handle a single client (some examples couldn't even do that much -- the server could only handle a single receive/echo cycle).
 
 With a small handful of additional code and some `Task` management, it's easy to create an echo server that can handle a very large number of simultaneous clients. But even that isn't realistic because, as you'll see, once a websocket connection is established, the "servicing loop" is isolated into its own separate `Task`. A real program does more than simple echo operations, which implies communications to and from the world outside of a `Task` loop. Thus, the GitHub repository contains two sample projects -- WebSocketExample, which is your basic multi-client echo server, and WebSocketWithBroadcast, which is an echo server, but the outer `Main` loop also periodically broadcasts the server time to all connected websocket clients.
 
-These two projects differ from ever other example I've found in a couple of interesting ways. 
+These two projects differ from every other example I've found in a couple of interesting ways. 
 
 In terms of the problem I was originally trying to solve, I quickly realized that once I had a websocket server running, a simple HTML+JS client might be superior to a dedicated console-based websocket client app. JS has done a good job at making websockets ridiculously easy to use, and since the initial connection of a websocket is HTTP-based (a process called "upgrading" the HTTP connection to a separate new websocket connection), that also meant my demo servers could deliver this basic HTML+JS client app. They are effectively the server and client wrapped into one. Of course, nothing prevents you from writing a stand-alone websocket client app if your data-exchange needs are more complex than "dump to console" streaming.
 
-The other big difference is the basic structure of the applications. None of the examples I found were able to cleanly handle the shutdown process. The HTTP side of the system is based upon the [HttpListener](https://docs.microsoft.com/en-us/dotnet/api/system.net.httplistener?view=netcore-2.2) class, which includes a `Start` and `Stop` method, yet none of the examples allowed for a clean use of `Stop`. This, too, is easy to accomodate with relatively minor adjustments in the overall application structure.
+The other big difference is the basic design of the control-flow in my code. None of the examples I found were able to cleanly handle the shutdown process. The HTTP side of the system is based upon the [HttpListener](https://docs.microsoft.com/en-us/dotnet/api/system.net.httplistener?view=netcore-2.2) class, which includes a `Start` and `Stop` method, yet none of the examples allowed for a clean use of `Stop`. This, too, is easy to accomodate with relatively minor adjustments in the overall application structure.
 
 And of course, since I'm using .NET's modern async `Task` features (which were still rather primitive under .NET 4.0 when Paul published his example), we want full cancellation support to maximize our control over the process -- again, something that only takes a few extra lines of code to realize.
 
@@ -75,7 +75,7 @@ Just four methods are needed for a complete, correct echo server: `Start` and `S
 
 We also use a few `static` fields. The single instance of `HttpListener` is used by `Start` and `Stop` and `Listen`, and the `CancellationTokenSource` as well as the `CancellationToken` itself are stored at the class level, which allows any of the methods to both watch for cancellation or request cancellation. Finally, we have an integer named `SocketCounter`, which is incremented whenever a new connection is established. This acts as a unique ID for the websocket processing loop. In theory we'd want to somehow throttle the number of active connections, but for the sake of a demonstration this isn't important. (ASP.NET 4.5 was documented as supporting more than 100,000 concurrent websocket connections, and this example is certainly more lightweight than that stack!)
 
-The `Start` method accepts a URI Prefix (refer to the [documentation](https://docs.microsoft.com/en-us/dotnet/api/system.net.httplistener?view=netcore-2.2#remarks) for more information about how these are formatted, warnings about secure usage, and so on). Notice we wrap up the `Listen` method call in a separate async `Task` but we don't store the `Task` handle, and we definitely don't want to `await` it because it loops indefinitely. The `Listener.IsListening` check is probably unnecessary, I've found that most startup issues result in an exception.
+The `Start` method accepts a URI Prefix (refer to the [documentation](https://docs.microsoft.com/en-us/dotnet/api/system.net.httplistener?view=netcore-2.2#remarks) for more information about how these are formatted, warnings about secure usage, and so on). Notice we wrap up the `Listen` method call in a separate async `Task` but we don't store the `Task` handle, and we definitely don't want to `await` it because it loops indefinitely. The `Listener.IsListening` check is probably unnecessary since most startup issues seem to throw an exception.
 
 ```c#
 public static void Start(string uriPrefix)
@@ -208,7 +208,7 @@ catch (Exception)
 
 `AcceptWebSocketAsync` returns a different type of websocket-specific context. Notice the `subProtocol: null` argument. A sub-protocol is an application-specific feature meant to control how the client and server will communicate once the websocket is established. (It is a "sub" protocol because websockets is the "real" protocol.) The client can list the sub-protocols it supports, and this parameter notifies the client of the protocol chosen by the server. Examples might be "text" or "json", although it appears sub-protocols aren't a widely-used feature.
 
-We also use the thread-safe `Interlocked` class to increment the websocket counter, and the result is the unique ID of the new websocket we're about to create. In this particular example the ID is only used for output purposes, but in the other WebSocketWithBroadcasts example we'll talk about shortly, it has more important functionality.
+We also use the thread-safe `Interlocked` class to increment the websocket counter, and the result is the unique ID of the new websocket we're about to create. In this particular example the ID is only used for output purposes, but in the other WebSocketWithBroadcasts example we'll talk about shortly, it plays a more important role.
 
 Finally, the websocket context data and the socket ID are handed off to the websocket processing loop in the `ProcessWebSocket` method. This is wrapped in an asynchronous task. (The leading underscore-assingment syntax is a [discard](https://docs.microsoft.com/en-us/dotnet/csharp/discards) added in the 7.0 version of the C# language -- it just means we don't care about the return value, but since we do have an assignment, Roslyn won't complain that we haven't awaited or stored the `Task`).
 
@@ -263,13 +263,13 @@ This example processes `Text` payloads, although `Binary` is possible. For some 
 
 Notice that the websocket object is disposed by a `finally` block. Although they're lightweight, websockets do involve unmanaged resources.
 
-From the purely foundational standpoint of "doing it correctly", that is all you need to know to work with websockets in .NET. If you want to write a client websocket application, there is a [ClientWebSocket](https://docs.microsoft.com/en-us/dotnet/api/system.net.websockets.clientwebsocket?view=netcore-2.2) class available which basically wraps up a lot of this same functionality. It's pretty easy to use and you should be able to apply the same async `Task` techniques to keep your application responsive.
+And we're done! From a purely foundational standpoint of "doing it correctly", that is all you need to know to work with websockets in .NET. If you want to write a client websocket application, there is a [ClientWebSocket](https://docs.microsoft.com/en-us/dotnet/api/system.net.websockets.clientwebsocket?view=netcore-2.2) class available which basically wraps up a lot of this same functionality. It's pretty easy to use and you should be able to apply the same async `Task` techniques to keep your application responsive.
 
 ## Beyond Echo
 
-My other example is called WebSocketWithBroadcasts. It is the same echo server with one key difference -- the `Main` program loop periodically broadcasts a message (in this case, a server timestamp) to all connected websocket clients. Strictly speaking, this isn't a websocket problem, it's more about communication across `Task` boundaries. In the earlier example, we saw that the `ProcessWebSocket` method is it's own little world, looping and echoing until the websocket is closed. It isn't easy to see how to communicate into or out of that walled garden.
+My other example is called WebSocketWithBroadcasts. It is the same echo server with one key difference -- the `Main` program loop periodically broadcasts a message (in this case, a server timestamp) to all connected websocket clients. Strictly speaking, this isn't a websocket problem, it's more about communication across `Task` boundaries. However, it exposes a few important considerations you'll need to accomodate to build a real websocket server. 
 
-In this example, the `Main` "outer" program gets a little more interesting. We start and stop the server in the same fashion, but instead of blocking indefinitely waiting for a keystroke, we've added a simple loop which calls a new `WebSocketServer.Broadcast` message every few seconds.
+In the earlier example, we saw that the `ProcessWebSocket` method is it's own little world, looping and echoing until the websocket is closed. It isn't easy to see how to communicate into or out of that walled garden. For this example, the `Main` "outer" program gets a little more interesting. We start and stop the server in the same fashion, but instead of blocking indefinitely waiting for a keystroke, we've added a simple loop which calls a new `WebSocketServer.Broadcast` message every few seconds.
 
 ```c#
 const int BROADCAST_INTERVAL_SEC = 15;
@@ -302,7 +302,7 @@ static void Main(string[] args)
 }
 ```
 
-Inside the `WebSocketServer` class, the `Start`, `Stop` and HTTP-oriented `Listen` methods are identical to those shown previously for the basic echo server. However, we find a new `using System.Collections.Concurrent;" statement at the beginning, and a new `static` field has been defined:
+Inside the `WebSocketServer` class, the `Start`, `Stop` and HTTP-oriented `Listen` methods are identical to those shown previously for the basic echo server. However, we find a new `using System.Collections.Concurrent` statement at the beginning, and a new `static` field has been defined:
 
 ```c#
 // The dictionary key corresponds to active socket IDs, and the BlockingCollection wraps
@@ -386,7 +386,7 @@ If a message was successfully obtained from the queue, we use the typical `Encod
 
 ## WebSocket Thread Safety
 
-There is still a couple of hidden gotchas in our second example. Rather surprisingly (and probably in the interests of maximizing performance), websockets aren't thread-safe. The documentation states that it's safe to have concurrent `ReceiveAsync` and `SendAsync` operations in progress, but only one of each. Two concurent `SendAsync` calls to the same websocket will (apparently) cause trouble.
+There are still a couple of hidden gotchas in our second example. Rather surprisingly (and probably in the interests of maximizing performance), websockets aren't thread-safe. The documentation states that it's safe to have concurrent `ReceiveAsync` and `SendAsync` operations in progress, but only one of each. Two concurent `SendAsync` calls to the same websocket will (apparently) cause trouble.
 
 Fortunately, we have already built the solution to this problem with our dictionary of queues. The earlier echo server simply called `SendAsync` with whatever was just received, but our Broadcast demo converts that buffer to a string and adds it back to the websocket's own queue, allowing the queue-processing loop to send it back to the client. The old echo code from `ProcessWebSocket` looked like this:
 
@@ -423,15 +423,15 @@ await socket.CloseAsync(WebSocketCloseStatus.NormalClosure, "", Token);
 
 Once you start working on a real websockets application, there are a couple of other things you'll want to keep in mind.
 
-#### Catching `WebSocketException`
+### Catching WebSocketException
 
 These examples are missing one exception handler that you should definitely implement: [`WebSocketException`](https://docs.microsoft.com/en-us/dotnet/api/system.net.websockets.websocketexception?view=netcore-2.2). This will be thrown whenever there is a network-level error (which seems like an unnecessary distraction for the purposes of sample code). In particular you'll want to inspect the `WebSocketErrorCode` property, which returns a [`WebSocketError`](https://docs.microsoft.com/en-us/dotnet/api/system.net.websockets.websocketerror?view=netcore-2.2) enumeration describing what went wrong.
 
-#### Web Socket Security
+### Web Socket Security
 
-Just like HTTP web servers, a websocket server must be secured. This is a broad topic which is well-documented on the Internet, so there isn't any point in re-hashing it here. By way of guidance, you should plan to run over WSS (the protocol name for a websocket using SSL/TLS encryption), and you should also research cross-site vulnerabilities -- websockets _do not_ adhere to the Same-Origin policies used by browsers (although the headers are present if you want to add your own CORS whitelisting check). Sadly, it's difficlt to find information that doesn't also assume you're running under ASP.NET. I don't have any handy links to share because my current requirements are 100% local-network-based, so I don't really have a need, though I have read enough about it to know non-ASP.NET information is available if you dig for it.
+Just like HTTP web servers, a websocket server must be secured. This is a broad topic which is well-documented on the Internet, so there isn't any point in re-hashing it here. By way of guidance, you should plan to run over WSS (the protocol name for a websocket using SSL/TLS encryption), and you should also research cross-site vulnerabilities -- websockets _do not_ adhere to the Same-Origin policies used by browsers (although the headers are present if you want to add your own CORS whitelisting check). Sadly, it's a little difficult to find information that doesn't also assume you're running under ASP.NET. I don't have any handy links to share because my current requirements are 100% local-network-based, so I don't really have a need, though I have read enough about it to know non-ASP.NET information is available if you dig for it.
 
-#### Concurrent Collection Usage
+### Concurrent Collection Usage
 
 As stated earlier, the details of using classes like `ConcurrentDictionary<T>` aren't really the point of this article, but there are a couple of things you should be aware of (and you should research the proper use of these classes before trying to use them in a real project). 
 
