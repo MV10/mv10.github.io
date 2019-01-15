@@ -5,9 +5,10 @@ header:
   image: "/assets/2018/mm-dd/header1280.png"
   teaser: "/assets/2018/mm-dd/header1280.png"
 
+# standard header size is 1280 x 400
 # image paths:
-#   publish:                        (/assets/2018/mm-dd/pic.jpg)
-#   edit from _post or _templates:  (../assets/2018/mm-dd/pic.jpg)
+#   publish:                        (/assets/2019/mm-dd/pic.jpg)
+#   edit from _post or _templates:  (../assets/2019/mm-dd/pic.jpg)
 ---
 
 Initial text that will be excerpted on index page.
