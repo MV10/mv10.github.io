@@ -8,7 +8,7 @@ header:
 # standard header size is 1280 x 400
 # image paths:
 #   publish:                        (/assets/2019/mm-dd/pic.jpg)
-#   edit from _post or _templates:  (/assets/2019/mm-dd/pic.jpg)
+#   edit from _post or _templates:  (../assets/2019/mm-dd/pic.jpg)
 ---
 
 WPF support in .NET Core 3.0 Preview 1 is remarkably complete.
@@ -136,6 +136,6 @@ The other useful sample project is the windowless version of a System Tray icon.
 
 As the introduction suggested, I was pleasantly surprised at how complete WPF support seems to be in this early alpha release. I later copied several other WPF applications and everything I tried just worked out of the box, project configuration details notwithstanding. Despite the entire stack being in preview status, I didn't encounter any bugs at all. I was able to debug into the projects without issues, they ran stand-alone just fine, and so on. Pretty impressive if you ask me, WPF is neither small nor simple.
 
-Are you an enterprise web-app developer who thinks desktop apps have lost their relevance? [Question your assumptions!]({{ site.baseurl }}{% post_url 2018-03-10-how-web-apps-ruined-developer-productivity#weve-always-done-it-that-way %})
+Are you an enterprise web-app developer who thinks desktop apps have lost their relevance? [Question your assumptions!]({{ site.baseurl }}{% post_url 2018-03-10-how-web-apps-ruined-developer-productivity %})
 
 Whatever reasons you may have to build Windows desktop applications, I highly recommend setting up a VM and giving these preview bits a test drive.
