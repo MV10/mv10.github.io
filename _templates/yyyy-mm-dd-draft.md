@@ -2,8 +2,8 @@
 title: TITLE
 tags: personal c# .net azure ai odm java unity
 header:
-  image: "/assets/2018/mm-dd/header1280.png"
-  teaser: "/assets/2018/mm-dd/header1280.png"
+  image: "/assets/2019/mm-dd/header1280.png"
+  teaser: "/assets/2019/mm-dd/header1280.png"
 
 # standard header size is 1280 x 400
 # image paths:
