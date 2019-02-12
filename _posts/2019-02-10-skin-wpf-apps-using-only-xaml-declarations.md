@@ -116,6 +116,8 @@ private void SkinUpdated(object sender, object eventArgs)
 
 I plan to revisit this update process in the future. Although reloading controls from the code-behind is clearly a UI-specific concern, I dislike the fact that the code-behind has dependencies on specific XAML values (control names). I would like to find a clean way for user controls to register and unregister themselves for reloading when a skin changes, or perhaps a way to query WPF for dependencies on the skinning resources so that these updates don't require programmer intervention when the XAML UI is modified. But that's a project for another day.
 
+**Update:** After spending several hours trying many different approaches, I don't think there is a clean and simple way to automate the reload process. I even went so far as to serialize the controls, then deserialize a new instance, using reflection to automatically replace the parent's `Child` or `Children` references, and I still encountered problems. I suppose the best guidance I can offer is to ensure your entire UI is implemented as user controls (no view-model-dependent XAML in `MainWindow`, for example) and ensure you keep a reference to your view models when you reload affected UI elements so that the new instance can restore state from your view model properties.
+
 ## Clean MVVM Matters
 
 One difference between Michael's example and mine is that I've added a `ListBox` to the project. 
