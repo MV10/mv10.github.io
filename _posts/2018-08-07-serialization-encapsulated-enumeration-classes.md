@@ -218,15 +218,18 @@ You can see that the `WriteJson` implementation is trivial -- JSON data is alway
 
 Crucially, when `ReadJson` is invoked at runtime, `GetType()` will return the _derived_ class such as `EnumYesNo`, rather than the `Enumeration<T>` class where this method is defined. The code retrieves a list of public static declarations. For `EnumYesNo` this list is the static `Yes`, `No`, and `Undefined` instances of the class. It iterates over that list looking for any entries that are of the same derived type. It compares the `WriteJson` output to the value passed in by JSON.NET, and if a match is found, that instance is returned. The call to `Activator.CreateInstance` is the reason our constructors are declared `public` rather than `protected` as in the Microsoft version.
 
+This means each individual encapsulation class doesn't need to handle serialization or deserialization at all. However, by declaring our implementations as `virtual` we can allow any derived class to override this implementation if necessary.
+
 Incidentally, with a little casting, any part of your application could also use this method to turn a raw data value into an enumeration instance.
 
 ```c#
 string EliteDataValue = QueryEliteFlag(customerId); // returns Y or N
-var EliteStatus = (EnumYesNo)((IEnumerationJson)EnumYesNo.ReadJson(EliteDataValue));
+var EliteStatus = (EnumYesNo)EnumYesNo.Undefined.ReadJson(EliteDataValue);
 // etc...
 ``` 
 
-This means each individual encapsulation class doesn't need to handle serialization or deserialization at all. However, by declaring our implementations as `virtual` we can allow any derived class to override this implementation if necessary.
+**Update:** An earlier version of this article omitted `Undefined` in the parsing code shown above. More recently, I have posted [this article]({{ site.baseurl }}{% post_url 2019-05-04-parsing-for-encapsulated-enumerations %}) demonstrating a cleaner approach to parsing.
+{: .notice--warning}
 
 ## Test Run
 
