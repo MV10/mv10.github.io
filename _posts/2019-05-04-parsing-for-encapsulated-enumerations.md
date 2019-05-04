@@ -2,8 +2,8 @@
 title: Parsing for Encapsulated Enumeration Classes
 tags: vs2017 .net .netcore reflection
 header:
-  image: "/assets/2019/05-04/header1280.png"
-  teaser: "/assets/2019/04-04/header1280.png"
+  image: "/assets/2019/05-04/header1280.jpg"
+  teaser: "/assets/2019/04-04/header1280.jpg"
 
 # standard header size is 1280 x 400
 # image paths:
