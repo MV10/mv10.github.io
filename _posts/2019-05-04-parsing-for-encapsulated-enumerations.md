@@ -64,9 +64,12 @@ public class MyBaseClass
 
 public class MyDerivedClass : MyBaseClass
 { }
+
+MyBaseClass.WhoAmI();
+MyDerivedClass.WhoAmI();
 ```
 
-Calling `MyDerivedClass.WhoAmI()` will return `MyBaseClass` because the compiled code looks like this:
+Both calls to `WhoAmI()` return `MyBaseClass` because the compiled code looks like this:
 
 ```
 IL_0001:  call        MyBaseClass.WhoAmI
@@ -118,7 +121,7 @@ public static E Parse<E>(T code) where E : Enumeration<T>, new()
 
 Incidentally, direct casting such as `(string)code` will not compile. You will get an error message stating that `T` can't be converted to a string, because the compiler can't guarantee the conversion will always work. However, using the `as` keyword allows for the possibility of a `null` result, which can be short-circuited, and so the compiler accepts this. At runtime, of course, the type-checking condition guarantees that the conversion will work, and we get the desired results:
 
-```
+```xml
 Raw value:
   y
 Parsed enum:
