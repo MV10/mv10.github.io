@@ -25,7 +25,7 @@ A 2011 IETF document that goes by the thrilling name RFC 6455 defines the WebSoc
 
 It was pretty easy to get a .NET WebSocket client up and running. It really is mostly a variation on the server code from the earlier article. But every attempt to close the connection, whether I initiated it from the client or the server, resulted in one or both sides throwing an exception with the message `The remote party closed the WebSocket connection without completing the close handshake.`
 
-![Exception](../assets/2019/08-17/exception.jpg)
+![Exception](/assets/2019/08-17/exception.jpg)
 
 In .NET the closing handshake happens through a series of state transitions. Ignoring which is the client and which is the server, a session between Party A and Party B should look like this:
 
@@ -69,7 +69,7 @@ When you're writing server WebSocket code and the server wants to initiate the s
 
 With the correct closing code in place, the server responds cleanly when the client closes the socket, and vice-versa:
 
-![ServerCloseFrame](../assets/2019/08-17/servercloseframe.jpg)
+![ServerCloseFrame](/assets/2019/08-17/servercloseframe.jpg)
 
 ## ReceiveAsync Hates a Quitter
 
