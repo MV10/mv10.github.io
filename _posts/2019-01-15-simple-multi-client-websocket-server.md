@@ -14,6 +14,9 @@ Learn from this simple websocket server with realistic features.
 
 <!--more-->
 
+**Update:** The GitHub code for this article has been updated as a result of my newer August 2019 article [How to Close a WebSocket (Correctly)]({{ site.baseurl }}{% post_url 2019-08-17-how-to-close-websocket-correctly %}).
+{: .notice--warning}
+
 In the old days, dumping debug information to the console was disparagingly referred to as "printf debugging". After all, when your _only_ output is the character mode screen (I'm talking the _really_ old days, the 70s and 80s), trashing everything with debug output was kind of sloppy. But regardless of what crusty old C programmers might think, these days I make heavy use of this approach. I recently ran into a scenario where it would be very handy to have multiple consoles. I was very surprised to discover Windows doesn't support this -- not even if you're willing to p/invoke calls to the Win32 API.
 
 There are lots of other ways to accomplish similar results, of course. If the data is minimal, stash it into a `List<string>` and dump it to a file. For heavyweight requirements, you could go to extremes and use a plug-in logger like Serilog. But old habits die hard, and I wanted live, console-style output. The next best thing was to send my output to another process, a console-by-proxy.
@@ -114,6 +117,9 @@ public static void Stop()
     }
 }
 ```
+
+**Update:** See my newer followup article [How to Close a WebSocket (Correctly)]({{ site.baseurl }}{% post_url 2019-08-17-how-to-close-websocket-correctly %}) for an explanation about problems with this `Stop()` method.
+{: .notice--warning}
 
 ## Your HTTP Qualifies for an Upgrade
 
@@ -258,6 +264,9 @@ private static async Task ProcessWebSocket(HttpListenerWebSocketContext context,
 Websockets exchange data in chunks called "frames" (a side-effect of being very closely related to the same concept in raw TCP/IP sockets). This example creates a 4K buffer, so if the incoming data exceeds 4K, another chunk will follow until the entire message is completed. Obviously for a simple echo server this isn't too likely to be a problem, but depending on your real-world scenario, you should keep this possibility in mind. You can't tell how much data is in a message until the sender sends the end-of-message flag with the last frame ("sender" can be the server or the client). Some usage scenarios such as streaming video many never send an end-of-message frame.
 
 There are three `WebSocketMesageType` values possible: `Text`, `Binary`, and `Close`. The `Close` message isn't really a request, it's an indicator that the websocket is closing. Normally you want to respond with another close operation on your side which, if nothing else, should release resources. In the case of this server code, it will also change the `State` to one of the closing values, which will terminate the `while` loop and complete the `Task`.
+
+**Update:** See my newer followup article [How to Close a WebSocket (Correctly)]({{ site.baseurl }}{% post_url 2019-08-17-how-to-close-websocket-correctly %}) for a more in-depth look at how the close handshake is supposed to work.
+{: .notice--warning}
 
 This example processes `Text` payloads, although `Binary` is possible. For some clients the difference may not be important, but in the case of a JS client, a `Text` message results in a simple string value, whereas a `Binary` message produces a JavaScript `Blob` object. Since the echo server can just turn around and send the exact same buffer back to the client, we won't address outbound buffer setup until we get to the broadcast example.
 
