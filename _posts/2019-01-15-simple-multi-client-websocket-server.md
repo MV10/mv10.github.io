@@ -1,6 +1,6 @@
 ---
 title: A Simple Multi-Client WebSocket Server
-tags: c# .net websocket
+tags: c# .net asp.net asp.net-core websocket
 header:
   image: "/assets/2019/01-15/header1280.png"
   teaser: "/assets/2019/01-15/header1280.png"
@@ -14,7 +14,7 @@ Learn from this simple websocket server with realistic features.
 
 <!--more-->
 
-**Update:** The GitHub code for this article has been updated as a result of my newer August 2019 article [How to Close a WebSocket (Correctly)]({{ site.baseurl }}{% post_url 2019-08-17-how-to-close-websocket-correctly %}).
+**Update:** The GitHub code for this article has been updated as a result of my newer August 2019 articles, [How to Close a WebSocket (Correctly)]({{ site.baseurl }}{% post_url 2019-08-17-how-to-close-websocket-correctly %}) and [A Minimal Full-Feature Kestrel WebSocket Server]({{ site.baseurl }}{% post_url 2019-08-18-minimal-full-feature-kestrel-websocket-server %}).
 {: .notice--warning}
 
 In the old days, dumping debug information to the console was disparagingly referred to as "printf debugging". After all, when your _only_ output is the character mode screen (I'm talking the _really_ old days, the 70s and 80s), trashing everything with debug output was kind of sloppy. But regardless of what crusty old C programmers might think, these days I make heavy use of this approach. I recently ran into a scenario where it would be very handy to have multiple consoles. I was very surprised to discover Windows doesn't support this -- not even if you're willing to p/invoke calls to the Win32 API.

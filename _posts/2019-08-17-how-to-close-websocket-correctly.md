@@ -1,6 +1,6 @@
 ---
 title: How to Close a WebSocket (Correctly)
-tags: c# .net websocket
+tags: c# .net asp.net asp.net-core websocket
 header:
   image: "/assets/2019/08-17/header1280.png"
   teaser: "/assets/2019/08-17/header1280.png"
@@ -18,6 +18,9 @@ WebSockets are all about state-management.
 Back in January, I posted an article titled [A Simple Multi-Client WebSocket Server]({{ site.baseurl }}{% post_url 2019-01-15-simple-multi-client-websocket-server %}) which demonstrated how to write a WebSocket server with realistic features. That article used a browser-based client, but this month I started working on a new project which happened to require a .NET WebSocket client, and to my dismay, I realized my code to handle closing a WebSocket had problems that were simply ignored by web browser clients. Before I get into the details, there is a bug in .NET Core client WebSocket implementations prior to .NET Core 3.0 which makes it impossible to cleanly close a WebSocket from the client. The code now on GitHub uses 3.0, currently in preview, but it works.
 
 Consequently, the [WebSocketExample](https://github.com/MV10/WebSocketExample) repository on GitHub for that older article has been heavily overhauled, and it also includes a third project called WebSocketClient which (not surprisingly) is a complete .NET WebSocket client. I'll discuss that briefly, but the general concept actually is pretty close to the WebSocket server shown earlier, apart from closing the connection.
+
+**Update:** The code has been updated as a result of a newer article, [A Minimal Full-Feature Kestrel WebSocket Server]({{ site.baseurl }}{% post_url 2019-08-18-minimal-full-feature-kestrel-websocket-server %}).
+{: .notice--warning}
 
 ## Breaking Up is Hard to Do
 
