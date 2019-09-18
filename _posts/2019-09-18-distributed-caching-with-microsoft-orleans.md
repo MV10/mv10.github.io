@@ -31,11 +31,11 @@ There are several concepts in Orleans that you should understand before we dig i
 
 In Orleans, each actor is called a grain, and silos are the host servers that manage and execute grains. There are stateless grains as well as stateful grains. Grains can communicate with one another, and client applications can also communicate with grains. (From a programming standpoint, you're just calling methods on a proxy to the grain; Orleans does use messaging but it's completely transparent to your code.) 
 
-Various "Storage Provider" packages are available to target different persistence models. As mentioned earlier, the grain lifecycle is completely managed by Orleans silos. "Deactivation" is when a silo decides a grain should be persisted to storage and unloaded from memory. This usually happens due to memory pressure. For this article, we are using the ADO.NET-based SQL Server library, but Orleans offers many Storage Provider implementations, including things like Azure Blob Storage which are very different from tradiational RDBMS storage.
+Various "Storage Provider" packages are available to target different persistence models. As mentioned earlier, the grain lifecycle is completely managed by Orleans silos. "Deactivation" is when a silo decides a grain should be persisted to storage and unloaded from memory. This usually happens due to memory pressure. For this article, we are using the ADO.NET-based SQL Server library, but Orleans offers many Storage Provider implementations, including things like Azure Blob Storage which are very different from traditional RDBMS storage.
 
 Silos register themselves in a database, and clients find and connect to silo servers by connecting to the same database. A silo database can persist many different types of grains, but caching tends to be a high-traffic activity, so like most distributed caching systems with persistent state, it's probably best to use a dedicated database for the cache.
 
-Multiple silos running on different servers but sharing the same database form a cluster. Silos communicate between themselves and clusters are completely self-managing systems. Clustering is how Orleans achieves cloud-grade scale-out capability.
+A cluster is automatically formed when multiple silos running on different servers share the same Orleans database. Silos communicate between themselves, and the cluster itself is a completely self-managing systems. Clustering is how Orleans achieves cloud-grade scale-out capability.
 
 ## The Cache Grain
 
@@ -53,7 +53,7 @@ public interface IOrleansDistributedCacheGrain<T> : IGrainWithStringKey
 }
 ```
 
-Despite returning `Task`, you may notice we don't follow the convention of adding `Async` to the method names. This interface is exactly the reason I'm not a fan of that convention. Whether or not the the `async` keyword is required is an implementation detail that can't necessarily be known at the interface level. If the `Set` method is using a simple in-memory `ConcurrentDictionary`, there will be no asynchronous calls, but if the implementation is doing database I/O, then `async` is likely. The actual implmentation ends up with a mix of each (for example, `Set` is asynchrnous but `Get` is synchronous).
+Despite returning `Task`, you may notice we don't follow the convention of adding `Async` to the method names. This interface is exactly the reason I'm not a fan of that convention. Whether or not the the `async` keyword is required is an implementation detail that can't necessarily be known at the interface level. If the `Set` method is using a simple in-memory `ConcurrentDictionary`, there will be no asynchronous calls, but if the implementation is doing database I/O, then `async` is likely. The actual implmentation ends up with a mix of each (for example, `Set` is asynchronous but `Get` is synchronous).
 
 Whenever possible, grain state should be wrapped in an `Immutable<>` object. This tells Orleans that the state will not change when Orleans is persisting the data. This improves performance since Orleans will try to deep-copy non-`Immutable` data prior to serialization. Since `IDistributedCache` works with byte-array copies rather than direct references to the data to be stored, it's safe to assume the data is always immutable.
 
@@ -170,7 +170,7 @@ Anyway, pop open your Sql Server Object Explorer window, create a new database n
 
 ## Silo Demo
 
-The silo in this article is is _not_ a production-quality silo implementation. It's just something you can run locally while you play with the system. **Never expose an Orleans silo directly to the Internet or to any untrusted network.** Silos are not secure and they are not intended to be used that way. Note also that silos do not currently support SSL/TLS security, although this is planned for the upcoming 3.0 release.
+The silo in this article is is _not_ a production-quality silo implementation. It's just something you can run locally while you play with the system. _Never expose an Orleans silo directly to the Internet or to any untrusted network._ Silos are not secure and they are not intended to be used that way. Note also that silos do not currently support SSL/TLS security, although this is planned for the upcoming 3.0 release.
 
 Silos are just console programs. Silo startup follows the extensible "builder" pattern seen elsewhere in .NET Core. You add various extension packages to your project which provide a fluent lambda-configured setup process, then conclude with a build-and-run call that brings it all together. This example uses the newer generic `HostBuilder` (the same thing ASP.NET Core is moving to, replacing the former `WebHostBuilder` class), and it also makes use of the `UseOrleans` extension which is currently undocumented.
 
@@ -368,7 +368,7 @@ Of course, given that my `IDistributedCache` implementation throws exceptions fo
 
 The last step is to show the two timestamps in the Index razor CSHTML:
 
-```razor
+```html
 @page
 @model IndexModel
 @{
