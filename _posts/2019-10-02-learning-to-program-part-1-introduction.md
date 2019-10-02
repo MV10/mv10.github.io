@@ -1,5 +1,5 @@
 ---
-title: Learning to Program Part 1: Introduction
+title: Learning to Program Part 1, Introduction
 tags: learning programming education
 header:
   image: "/assets/2019/10-02/header1280.png"
