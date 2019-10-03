@@ -32,32 +32,34 @@ But if you want to _write_ programs, saying they "do things" isn't good enough. 
 One simple definition of a program is that it turns inputs into outputs. Imagine a programming language that uses nothing but basic arithmetic. A program could look like this:
 
 ```
-1 + 2 = 3
+1 + 2 = ?
 ```
 
-In this "program" the numbers `1` and `2` are the inputs and `3` is the output. But a computer doesn't know what to do if you just throw numbers at it, programs also need _commands_ that control what a computer does with inputs and outputs. Believe it or not, this "program" also has two commands. The plus-sign tells the computer to add the inputs, and the equal-sign tells the computer to output the result of adding them together.
+In this "program" the numbers `1` and `2` are the inputs and `?` is the output you want the program to determine (which is 3, obviously). But a computer doesn't know what to do if you just throw numbers at it, programs also need _commands_ that control what a computer does with inputs and outputs. Believe it or not, this "program" also has two commands. The plus-sign tells the computer to add the inputs, and the equal-sign tells the computer to output the result of adding them together.
 
-Of course, real computers do a lot more than simple math. Non-technical people often still believe that programming involves a lot of math, but that isn't normally the case. If you don't like math, don't worry, most programming never involves anything more complicated than basic math. If you _do_ like math, you're in luck, computers can do crazy-complicated math, although we aren't going to cover any of that in this series.
+Modern languages and libraries (I'll explain libraries later) do a lot of things for you automatically, but you still have to tell a computer how to do almost _everything_ when you write programs.
 
-Back in the computing dark ages, computers really did mostly just do math, but these days "inputs" involve things like the keyboard and mouse, touch screens, data stored on disk or the Internet, audio, and just about anything else you can imagine. Similarly, the commands used to process that data are also a lot more extensive than simple mathematical operations. We'll get to all of that later.
+Of course, real computers do a lot more than simple math. Non-technical people often still believe that programming involves a lot of math, but that isn't normally the case. Back in the computing dark ages, computers really did mostly just do math, but these days "inputs" involve things like the keyboard and mouse, touch screens, data stored on disk or the Internet, audio, and just about anything else you can imagine. Similarly, the commands used to process that data are also a lot more extensive than simple mathematical operations. We'll get to all of that later. So if you don't like math, don't worry, most programming never involves anything more complicated than basic math. But if you _do_ like math, you're in luck, computers can do crazy-complicated math, although we aren't going to cover any of that in this series.
 
 ## Variables
 
 At some point in everyone's life, you are expected to learn algebra. When I learned to program, I was 8 years old and had probably never even heard the word. If you have learned algebra, you probably know what variables are. And even though I just wrote that programming rarely involves much math, it does rely very heavily on algebra's concept of the variable. Just in case I have any readers who haven't heard of algebra (or, like me, barely remember learning it), I'm going to explain what variables are. Skip ahead if you're comfortable with the concept.
 
-The simple math program shown earlier (`1 + 2 = 3`) isn't very useful because it can only do one thing: add 1 and 2, and output 3. Specific values like 1, 2, and 3 are called _literals_. Variables give us a way to re-use those commands (the plus-sign and equal-sign) and the program's logic with many different inputs and outputs instead of directly specifying literal values. (Sometimes you'll hear the term _hard-code_, as in the phrase "hard-coded values" -- this refers to literals in a program, values that never _vary_.)
+The simple math program shown earlier (`1 + 2 = 3`) isn't very useful because it can only do one thing: add 1 and 2, and output 3. Specific values like 1, 2, and 3 are called _literals_. Variables give us a way to re-use those commands (the plus-sign and equal-sign) and the program's logic with many different inputs and outputs instead of directly specifying literal values.
 
-A variable is just a "bucket" that can store a value. When a programmer uses a variable in a program, the computer can use the value stored _inside_ that bucket exactly as if the value itself was written directly into the program. In the math world, a variable is usually just a letter, so we'll start with that:
+A variable is just a "bucket" that can store a value. When a programmer uses a variable in a program, the computer can use the value stored _inside_ that bucket exactly as if the value itself was written directly into the program. Programs can take values out of a variable's "bucket" but they can also put new variables into the "bucket" as well. The root-world of "variable" is "vary" and by definition. the value of a variable can change over time, as the program runs.
+
+In the math world, a variable is usually just a letter, so we'll change our program to use variables:
 
 ```
 a + b = c
 ```
 
-We've used `a`, `b`, and `c` as those variable "buckets" which can hold any number. If we provide inputs by telling the computer that the `a` bucket contains the number `1`, and the `b` bucket contains the number `2`, the computer will put the number `3` into the `c` bucket. This is the variable-based version of the same thing we demonstrated earlier using the literal numbers 1, 2, and 3. But since we've replaced specific numbers with variables that can hold any number, we can run our program with _any_ two numeric inputs: assign `500` to `a`, and assign `250` to `b`, and when the computer processes our plus-sign and equal-sign commands, `c` becomes the total value, `750`. You can see how this flexibility is very useful: one calculation program, many inputs and outputs.
+We've used `a`, `b`, and `c` as those variable "buckets" which can hold any number (notice we've also turned our `?` placeholder into a variable). If we provide inputs by telling the computer that the `a` bucket contains the number `1`, and the `b` bucket contains the number `2`, the computer will put the number `3` into the `c` bucket. This is the variable-based version of the same thing we demonstrated earlier using the literal numbers 1 and 2, and always getting back 3. But since we've replaced specific numbers with variables that can hold any number, we can run our program with _any_ two numeric inputs: assign `500` to `a`, and assign `250` to `b`, and when the computer processes our plus-sign and equal-sign commands, `c` becomes the total value, `750`. You can see how this flexibility is very useful: one calculation program, many inputs and outputs.
 
 Computer programs are literally just lots of and lots of variables, with various commands telling the computer what to do with all of those variables. A program does convert inputs to outputs, but more importantly it lets us _re-use_ all of the commands in the program to process _different_ inputs into different outputs.
 
-In all modern computer languages, variables aren't limited to single letters. Variables are normally full words or even short phrases which describe what their "bucket" is meant to hold. These more descriptive variables are called _variable names_. Using more detailed variable names helps programmers understand what the code is supposed to be doing. Instead of having to remember that `a` is the price of something, and `b` is the sales tax, and `c` is the total cost, we can write our program using descriptive variable names:
+In all modern computer languages, variables aren't limited to single letters. Variables are normally full words or even short phrases which describe what their "bucket" is meant to hold. These more descriptive variables are called _variable names_. Using more detailed variable names helps programmers understand what the code is supposed to be doing.  Let's say we're writing a shopping cart program. At checkout the total is the sum of the list price and the sales tax. Instead of having to remember that `a` is the price of something, and `b` is the sales tax, and `c` is the total cost, we can write our program using descriptive variable names:
 
 ```
 listPrice + salesTax = totalCost
@@ -162,7 +164,7 @@ print totalCost
 
 The example above demonstrates something about functions in the world of programming. In the math world, functions _always_ return a value -- that's their whole point. In programming, functions "do stuff" which _may_ include returning a value. In this simple example, the `input()` function returns whatever the user has typed. But the `print(text)` function doesn't return anything, it just outputs the value of the `text` argument to the screen.
 
-Functions in the mathetmatical sense are usually just one equation, but it's important to understand that programming functions are small programs in their own right. In other words, the `input` and `print` functions are each made up from more programming code. Even though the `text` part of `print(text)` is the _argument_ to the `print` function, inside the code that makes 'print' do what it does, the 'text' argument is used just like any other variable. We call it an _argument_ instead of a variable to make it clear that it is input to a function.
+Functions in the mathetmatical sense are usually just one equation, but it's important to understand that programming functions are small programs in their own right. In other words, the `input` and `print` functions are each made up from more programming code. Even though the `text` part of `print(text)` is the _argument_ to the `print` function, inside the code that makes `print` do what it does, the `text` argument is used just like any other variable. We call it an _argument_ instead of a variable to make it clear that it is input to a function.
 
 This, too, is a core programming concept -- we can re-use code by packaging it up inside functions that are easy to refer to by name. Most programs are just a series of functions that call each other to do work on variables. You can think of functions as a type of command (and in fact, with only a few low-level exceptions, most programming languages are built exactly that way).
 
@@ -197,8 +199,8 @@ print("Please pay:")
 print totalCost
 ```
 
-Here in the "outer" code our price is stored in the variable `listPrice`, which we pass into the `CalculateTotal` function as an argument. Inside that function, the same value is represented by the `price` argument, which is used just like any other variable inside the function. The function's return value is assigned to the "outer" code's `totalCost` variable. Remember, this outer code (usually referred to as the _caller_) can't see the vaariables `tax` and `cost` inside the function -- it only sees the return value, the actual numeric value that was calculated and stored in the `cost` variable while the code inside `CalculateTotal` was still running.
+Here in the "outer" code our price is stored in the variable `listPrice`, which we pass into the `CalculateTotal` function as an argument. Inside that function, the same value is represented by the `price` argument, which is used just like any other variable inside the function. The function's return value is assigned to the "outer" code's `totalCost` variable. Remember, this outer code (usually referred to as the _caller_) can't see the variables `tax` and `cost` inside the function -- it only sees the return value, the actual numeric value that was calculated and stored in the `cost` variable while the code inside `CalculateTotal` was still running.
 
-## Conclusions
+## Conclusion
 
 Although these examples use a simple, imaginary language, they cover most of the important core ideas that all programmers use every single day. Next time we'll talk about slightly more complicated concepts that are also fundamental parts of writing software in any language.
