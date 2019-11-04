@@ -19,6 +19,9 @@ This article demonstrates how to implement [`IDistributedCache`](https://docs.mi
 
 The source for the article uses the pre-release version of .NET Core 3.0 RC1, but when that finally goes to full-release status, I will publish `McGuireV10.OrleansDistributedCache` as a NuGet package. The code for this article is in my GitHub [MV10/OrleansDistributedCache](https://github.com/MV10/OrleansDistributedCache) repository.
 
+**Update 2019-11-04:** The code has been updated to use .NET Core 3.0 and Orleans 3.0 release builds. The NuGet package is [available](https://www.nuget.org/packages/McGuireV10.OrleansDistributedCache/) and a new article has been posted about this: [Orleans Distributed Cache NuGet Release](https://mcguirev10.com/2019/11/04/orleans-distributed-cache-nuget-release.html). There are several updates in the article below, as well.
+{: .notice--warning}
+
 Orleans is one of those projects people refer to as a "hidden gem" -- it isn't widely known or even widely used, but once you get the hang of using it, you wonder how you got along without it. The Orleans repo features the dry description, "Distributed Virtual Actor Model" and the [documentation](http://dotnet.github.io/orleans/) is simultaneously very good and very bad. Good in the sense that it goes beyond the "API listing" that is so common these days, but bad because it's organized oddly and is not up-to-date in places. Orleans was originally designed by Microsoft Research as the services platform behind mega-hit multi-user games like Halo and Gears of War, but the current version (2.4.x, with 3.0 under active development) has matured into an excellent foundation for general-purpose microservice frameworks.
 
 The [actor model](https://www.brianstorti.com/the-actor-model/) dates back to 1973, making it one of the oldest software concepts still in widespread use today. The description in that link is worth reading if you aren't familiar with it. A very popular actor framework is AKKA.NET, which is a port of the Java AKKA framework. What Orleans brings to the table is _virtualization_. In systems like AKKA.NET, your code spends a lot of time managing actor lifecycles, communications, and other "plumbing". With Orleans, all of that goes away. You literally just ask for a reference to your actor (as the linked article explains, all actors have a unique key) and start calling its methods. Orleans does the rest -- making sure it exists, loading and unloading them, persisting and restoring state, and even managing all of this between multiple servers in the cluster. It's encapsulation taken to extremes, and it happens to be _great_ for scale-out, which is exactly what you want for microservices.
@@ -212,9 +215,12 @@ Next, we set up the Storage Provider which persists our cache grains. This is wh
     {
         opt.ConnectionString = ConnectionString;
         opt.Invariant = StorageProviderNamespace;
-        opt.UseXmlFormat = true;
+        opt.UseXmlFormat = true; // update: don't do this unless you really need it!
     })
 ```
+
+**Update 2019-11-04:** Be certain the data you're storing can be safely round-tripped if you use XML or JSON serialization. This caused issues in later testing, described in the newer article about this cache system: [Orleans Distributed Cache NuGet Release](https://mcguirev10.com/2019/11/04/orleans-distributed-cache-nuget-release.html). Keep in mind that Orleans is currently using custom serializers. Being able to round-trip your data on other platforms doesn't guarantee that Orleans can handle it. In particular, wiring up an XML-serialized cache to ASP.NET session (demonstrated later in this article) will cause problems which are detailed in the new article.
+{: .notice--warning}
 
 Now we'll set a couple of cluster options. The documentation glosses over these completely. They're used to support what Fowler (and Azure) calls the ["blue/green" depolyment](https://www.martinfowler.com/bliki/BlueGreenDeployment.html) model. If you aren't using this (its popularity is declining), the two values can be the same. Otherwise the `ServiceID` is effectively an application identifier (same for blue/green), but the `ClusterId` identifies your "blue" or "green" cluster servers. Meanwhile the shared `ServiceID` ensures both clusters use the same underlying storage.
 
@@ -241,6 +247,9 @@ When you run the silo project, a console window will open and begin spewing tons
 This silo is hard-coded to use localhost, but if you change it to listen on specific IPs and run multiple copies on different machines, you'll have an Orleans cluster running with exactly the same code. Clustering and scale-out load balancing is built into the very core of Orleans.
 
 ## Client Web App Demo
+
+**Update 2019-11-04:** Although you _can_ use this cache with ASP.NET session state storage, you shouldn't for a variety of reasons. To be clear, you can use the cache directly, just don't wire it up to session, as shown below. More details are available in the newer article: [Orleans Distributed Cache NuGet Release](https://mcguirev10.com/2019/11/04/orleans-distributed-cache-nuget-release.html).
+{: .notice--warning}
 
 Now we're ready to set up a web app to demonstrate our Orleans cache. The project is called `SessionStateDemo` because I wanted to show that it's truly 100% ASP.NET Core friendly. There are plenty of reasons to avoid using session state in a web-based app, but a quick-and-easy demo isn't one of them! This project began as the empty Razor Pages template in ASP.NET Core 3.0 RC1, and it's surprisingly easy to add this cache service to the project.
 
@@ -388,6 +397,9 @@ The last step is to show the two timestamps in the Index razor CSHTML:
 We have the silo running, so we fire up the web app in Firefox and are rewarded with a pair of very exciting timestamps on our index page. Refreshing the page demonstrates that the first value really was cached in session state because the second value ("Currently") shows a later timestamp. We then open a second browser window (a different browser, this time Edge, since session is browser-wide) to demonstrate multiple sessions:
 
 ![Browsers](/assets/2019/09-18/browsers.png)
+
+**Update 2019-11-04:** This only worked because the Silo I was running at the time didn't specify XML serialization. Once again, read the new article if you want the details: [Orleans Distributed Cache NuGet Release](https://mcguirev10.com/2019/11/04/orleans-distributed-cache-nuget-release.html).
+{: .notice--warning}
 
 In the silo console window, you can see log entries describing cache grain activity. This entry was logged when a new cache grain is instantiated:
 
