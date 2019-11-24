@@ -159,7 +159,7 @@ listPrice = input()
 salesTax = listPrice * 0.07
 totalCost = listPrice + salesTax
 print("Please pay:")
-print totalCost
+print(totalCost)
 ```
 
 The example above demonstrates something about functions in the world of programming. In the math world, functions _always_ return a value -- that's their whole point. In programming, functions "do stuff" which _may_ include returning a value. In this simple example, the `input()` function returns whatever the user has typed. But the `print(text)` function doesn't return anything, it just outputs the value of the `text` argument to the screen.
