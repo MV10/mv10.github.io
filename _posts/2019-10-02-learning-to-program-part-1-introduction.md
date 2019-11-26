@@ -204,3 +204,5 @@ Here in the "outer" code our price is stored in the variable `listPrice`, which 
 ## Conclusion
 
 Although these examples use a simple, imaginary language, they cover most of the important core ideas that all programmers use every single day. Next time we'll talk about slightly more complicated concepts that are also fundamental parts of writing software in any language.
+
+Part 2: [Data Types and Debugging]({{ site.baseurl }}{% post_url 2019-11-25-learning-to-program-part-2-data-types-and-debugging %})
