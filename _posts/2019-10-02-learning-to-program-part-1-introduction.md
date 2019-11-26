@@ -196,7 +196,7 @@ print("Enter the price:")
 listPrice = input()
 totalCost = CalculateTotal(listPrice)
 print("Please pay:")
-print totalCost
+print(totalCost)
 ```
 
 Here in the "outer" code our price is stored in the variable `listPrice`, which we pass into the `CalculateTotal` function as an argument. Inside that function, the same value is represented by the `price` argument, which is used just like any other variable inside the function. The function's return value is assigned to the "outer" code's `totalCost` variable. Remember, this outer code (usually referred to as the _caller_) can't see the variables `tax` and `cost` inside the function -- it only sees the return value, the actual numeric value that was calculated and stored in the `cost` variable while the code inside `CalculateTotal` was still running.
