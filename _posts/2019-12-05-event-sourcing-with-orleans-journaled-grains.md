@@ -230,7 +230,7 @@ var eventbase =
 state.Apply(eventbase);
 ```
 
-JSON.Net is able to deserialize the _real_ event class type (thanks to the [`TypeNameHandling`](https://www.newtonsoft.com/json/help/html/SerializeTypeNameHandling.htm) setting), but because .NET is statically-typed, our code has to reference the base class. This required adding another `Apply` method to the domain model state class to map the base class to the method for the real class:
+JSON.Net is able to deserialize the _real_ event class type (thanks to the [`TypeNameHandling`](https://www.newtonsoft.com/json/help/html/SerializeTypeNameHandling.htm) setting), but because .NET is statically-typed, our code has to reference the base class. Originally I used a giant `switch` statement to map the base class to the correct derived class, similar to this:
 
 ```csharp
 public void Apply(DomainEventBase eb)
@@ -254,7 +254,17 @@ public void Apply(DomainEventBase eb)
 }
 ```
 
-I don't particularly like that intermediate step, but I think it's better than the use of `dynamic` in the Orleans default implementation of `TransitionState` (which you can see in the source [here](https://github.com/dotnet/orleans/blob/master/src/Orleans.EventSourcing/JournaledGrain.cs#L276)).
+It was ugly, but I liked it better than the use of `dynamic` in the Orleans default implementation of `TransitionState` (which you can see in the source [here](https://github.com/dotnet/orleans/blob/master/src/Orleans.EventSourcing/JournaledGrain.cs#L276)). However, with just two lines of reflection code in the `ApplyNewerEvents` method, that last line (`state.Apply(eventbase)`) goes away, becoming:
+
+```csharp
+MethodInfo apply = 
+    typeof(CustomerState)
+    .GetMethod("Apply", new Type[] { eventbase.GetType() });
+
+apply.Invoke(state, new object[] { eventbase });
+```
+
+Given the overhead of the Dynamic Language Runtime, I'm not sure why Orleans doesn't do it this way.
 
 ## Grain Primary Key
 
