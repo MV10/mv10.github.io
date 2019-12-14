@@ -77,7 +77,7 @@ In a Blazor server-side application, authenticated user information is available
         if (string.IsNullOrWhiteSpace(Username))
             Username = 
                 state.User.Claims
-                .Where(c => c.Type.Equals("sid"))
+                .Where(c => c.Type.Equals("name"))
                 .Select(c => c.Value)
                 .FirstOrDefault() ?? string.Empty;
         
@@ -86,7 +86,9 @@ In a Blazor server-side application, authenticated user information is available
 }
 ```
 
-Later we'll take steps to ensure the user can't reach this content unless they're authenticated, so it's safe to simply assume user information is available. Unfortunately the demo IdentityServer site doesn't populate the `User.Identity.Name` property, so I added a bit of extra code to display the OIDC SubjectId just to have something to show for demo purposes.
+Later we'll take steps to ensure the user can't reach this content unless they're authenticated, so it's safe to simply assume user information is available. Unfortunately the default OIDC settings dosn't populate the `User.Identity.Name` property, so I added a bit of extra code to extract the `name` claim.
+
+We'll implement the `/Logout` link later.
 
 ## Configure OIDC in Startup
 
@@ -106,6 +108,7 @@ services.AddAuthentication(options =>
     options.ClientSecret = "secret";
     options.ResponseType = "code";
     options.SaveTokens = true;
+    options.GetClaimsFromUserInfoEndpoint = true;
 
     options.Events = new OpenIdConnectEvents
     {
@@ -223,6 +226,12 @@ Two changes are required at the start of `_Host.cshtml` -- you must tell the `@p
 The `{handler?}` parameter and how it relates to the model code is another one of a million little ASP.NET "conventions" that you just need to magically be aware of, which is annoying, but I have to admit it's all pretty concise and simple once you figure out what to do.
 
 And now if you run the project, everything works as expected. That's all it takes.
+
+## Expiration Problem
+
+Unfortunately, there is a minor problem with this approach -- the login will never expire. This is cookie-based authorization, but Blazor server-side works over SignalR connections. Those are glorified websocket connections which do not have HTTP concepts, including cookies. Even more unfortunately, Microsoft's current position on the problem seems to be, "We'll think about it some day, go figure it out for yourself."
+
+There _is_ a way to make it work, and in the next article, that's what we'll do.
 
 ## Conclusion
 
