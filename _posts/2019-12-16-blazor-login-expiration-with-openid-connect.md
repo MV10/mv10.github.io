@@ -11,7 +11,7 @@ header:
 #   edit from _post or _templates:  (../assets/2019/mm-dd/pic.jpg)
 ---
 
-Correctly expiring OIDC login access_tokens for Blazor server-side
+Correctly expiring OIDC login tokens for Blazor server-side apps
 
 <!--more-->
 
