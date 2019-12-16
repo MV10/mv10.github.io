@@ -19,6 +19,8 @@ This article briefly covers how to get OIDC authorization working for a Blazor s
 
 I had three goals for this article: login, logout, and some level of support for anonymous access. I found a lot of articles and StackOverflow questions that seem to partly address the problem, but I couldn't find a fully-working project. The code is available on my GitHub repository at [MV10/BlazorOIDC](https://github.com/MV10/BlazorOIDC). The project is based upon ASP.NET Core 3.1.
 
+A follow-up article is now available: [Blazor Login Expiration with OpenID Connect]({{ site.baseurl }}{% post_url 2019-12-16-blazor-login-expiration-with-openid-connect %}). Note that the repository now reflects the changes from this new article. Generally they're additions to the code shown in this article.
+
 ## Updating the Template
 
 I began with an off-the-shelf Blazor server-side app template _without_ ASP.NET Core Identity support of any kind. It isn't too important for our purposes, but the 3.1 template is lagging behind the libraries, so using the information documented [here](https://docs.microsoft.com/en-us/aspnet/core/security/blazor/?view=aspnetcore-3.1&tabs=visual-studio#customize-unauthorized-content-with-the-router-component), we update `App.razor` to match:
@@ -72,21 +74,19 @@ In a Blazor server-side application, authenticated user information is available
     protected override async Task OnInitializedAsync()
     {
         var state = await AuthState.GetAuthenticationStateAsync();
-        Username = state.User.Identity.Name;
         
-        if (string.IsNullOrWhiteSpace(Username))
-            Username = 
-                state.User.Claims
-                .Where(c => c.Type.Equals("name"))
-                .Select(c => c.Value)
-                .FirstOrDefault() ?? string.Empty;
+        Username = 
+            state.User.Claims
+            .Where(c => c.Type.Equals("name"))
+            .Select(c => c.Value)
+            .FirstOrDefault() ?? string.Empty;
         
         await base.OnInitializedAsync();
     }
 }
 ```
 
-Later we'll take steps to ensure the user can't reach this content unless they're authenticated, so it's safe to simply assume user information is available. Unfortunately the default OIDC settings dosn't populate the `User.Identity.Name` property, so I added a bit of extra code to extract the `name` claim.
+Later we'll take steps to ensure the user can't reach this content unless they're authenticated, so it's safe to simply assume user information is available. Unfortunately the default OIDC settings don't populate properties like `User.Identity.Name`, so we use a bit of LINQ to extract the `name` claim.
 
 We'll implement the `/Logout` link later.
 
@@ -130,6 +130,9 @@ The `OpenIdConnectEvents` handler just redirects the user to the site root when 
 
 After that code, we add a few more lines of code borrowed from the MVC Authorization Policy world:
 
+**Boldface:** The follow-up article ([Blazor Login Expiration with OpenID Connect]({{ site.baseurl }}{% post_url 2019-12-16-blazor-login-expiration-with-openid-connect %})) explains why this addition is unnecessary, and in fact does nothing useful.
+{: .notice--warning}
+
 ```csharp
 services.AddMvcCore(options =>
 {
@@ -140,7 +143,7 @@ services.AddMvcCore(options =>
 });
 ```
 
-The `RequireAuthenticatedUser` policy locks down the entire site by default. This means you don't have to sprinkle every corner of your codebase with authentication attributes and tests. When an anonymous user accesses the site, they're automatically and immediately redirected to the login server. 
+The `RequireAuthenticatedUser` policy locks down the entire site by default. This means you don't have to sprinkle every corner of your codebase with authentication attributes and tests. When an anonymous user accesses the site, they're automatically and immediately redirected to the login server.
 
 Unfortunately, that interferes with two of my three goals: anonymous access and logout. (Actually, logout is still possible, but the user is immediately redirected back to the server to perform a login again.)
 
@@ -232,6 +235,9 @@ And now if you run the project, everything works as expected. That's all it take
 Unfortunately, there is a minor problem with this approach -- the login will never expire. This is cookie-based authorization, but Blazor server-side works over SignalR connections. Those are glorified websocket connections which do not have HTTP concepts, including cookies. Even more unfortunately, Microsoft's current position on the problem seems to be, "We'll think about it some day, go figure it out for yourself."
 
 There _is_ a way to make it work, and in the next article, that's what we'll do.
+
+**Boldface:** The follow-up article is now available: [Blazor Login Expiration with OpenID Connect]({{ site.baseurl }}{% post_url 2019-12-16-blazor-login-expiration-with-openid-connect %}).
+{: .notice--warning}
 
 ## Conclusion
 
