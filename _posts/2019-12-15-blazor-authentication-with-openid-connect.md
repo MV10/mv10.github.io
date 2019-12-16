@@ -21,6 +21,8 @@ I had three goals for this article: login, logout, and some level of support for
 
 A follow-up article is now available: [Blazor Login Expiration with OpenID Connect]({{ site.baseurl }}{% post_url 2019-12-16-blazor-login-expiration-with-openid-connect %}). Note that the repository now reflects the changes from this new article. Generally they're additions to the code shown in this article.
 
+I should also note this is only concerned with the Blazor server-side rendering model. I make my living building in-house enterprise apps, and the download-heavy all-local WebAssembly client-side model doesn't make much sense when everybody is on the same network and I know I can deploy to a large web farm of high-end servers. I'm also not thrilled with how far behind .NET Core the Xamarian framework is lagging (having experienced that first-hand after a few years of working on games in Unity, which is even further behind). WebAssembly is very cool, but I'm just not a fan of the "one giant download" model, especially if I'm still constrained to the use of the twin trainwrecks of our age, HTML and CSS.
+
 ## Updating the Template
 
 I began with an off-the-shelf Blazor server-side app template _without_ ASP.NET Core Identity support of any kind. It isn't too important for our purposes, but the 3.1 template is lagging behind the libraries, so using the information documented [here](https://docs.microsoft.com/en-us/aspnet/core/security/blazor/?view=aspnetcore-3.1&tabs=visual-studio#customize-unauthorized-content-with-the-router-component), we update `App.razor` to match:
