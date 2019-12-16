@@ -132,7 +132,7 @@ The `OpenIdConnectEvents` handler just redirects the user to the site root when 
 
 After that code, we add a few more lines of code borrowed from the MVC Authorization Policy world:
 
-**Boldface:** The follow-up article ([Blazor Login Expiration with OpenID Connect]({{ site.baseurl }}{% post_url 2019-12-16-blazor-login-expiration-with-openid-connect %})) explains why this addition is unnecessary, and in fact does nothing useful.
+**Update:** The follow-up article ([Blazor Login Expiration with OpenID Connect]({{ site.baseurl }}{% post_url 2019-12-16-blazor-login-expiration-with-openid-connect %})) explains why this addition is unnecessary, and in fact does nothing useful.
 {: .notice--warning}
 
 ```csharp
@@ -238,7 +238,7 @@ Unfortunately, there is a minor problem with this approach -- the login will nev
 
 There _is_ a way to make it work, and in the next article, that's what we'll do.
 
-**Boldface:** The follow-up article is now available: [Blazor Login Expiration with OpenID Connect]({{ site.baseurl }}{% post_url 2019-12-16-blazor-login-expiration-with-openid-connect %}).
+**Update:** The follow-up article is now available: [Blazor Login Expiration with OpenID Connect]({{ site.baseurl }}{% post_url 2019-12-16-blazor-login-expiration-with-openid-connect %}).
 {: .notice--warning}
 
 ## Conclusion
