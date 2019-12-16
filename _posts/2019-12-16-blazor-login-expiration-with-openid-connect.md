@@ -25,11 +25,13 @@ The OIDC protocols are a bit difficult to understand. It turns out there are fou
 
 One is a simple expiration timestamp. If your login token is still valid (it hasn't expired), but your cookie _has_ expired, you'll be logged out of the client. On your next trip to IdentityServer (and probably other OIDC authorities), the cookie for that domain may still be valid, in which case you'll be automatically logged back in with no login UI presented. (This is the problem I addressed in January of 2018 in [SignOutAsync and IdentityServer Cookies]({{ site.baseurl }}{% post_url 2018-01-26-signoutasync-and-identity-server-cookies %})).
 
-Another way is browser-session-based. The browser destroys the cookie when the user exits the browser. Setting the cookie to be persistent disables this behavior. (I addressed [this scenarioplaintext]({{ site.baseurl }}{% post_url 2018-01-12-persistent-login-with-identityserver %}) last year, too.)
+Another way is browser-session-based. The browser destroys the cookie when the user exits the browser. Setting the cookie to be persistent disables this behavior. (I addressed [this scenario]({{ site.baseurl }}{% post_url 2018-01-12-persistent-login-with-identityserver %}) last year, too.)
 
 Probably the most common approach is a "sliding expiration". The cookie expires after a certain period of inactivity. If the user performs some server-based activity in the app (navigating to a new page, downloading content, etc.) before that timespan expires, halfway through the expiration period the server will issue a new cookie, resetting the clock on the expiration.
 
 Finally, there is a way which isn't directly cookie-driven: a specific point in time after which the login token is considered invalid, and the user must authenticate again from scratch. There are still cookies involved but they do not control login expiration (as long as the cookie expiration exceeds the login expiration, which is normally the case).
+
+It's important to note that OIDC does _not_ provide a mechanism to renew a login short of a full new logout / login cycle. (OIDC refresh tokens only work for API-scoped access tokens. You don't even get a refresh token back in response to a login-only auth request.)
 
 ## Applying Login Expiration
 
@@ -229,7 +231,7 @@ protected override Task<bool> ValidateAuthenticationStateAsync(AuthenticationSta
 }
 ```
 
-This does such a tiny amount of work, it didn't seem important to test the cancellationToken.
+This does such a tiny amount of work, it didn't seem important to test the cancellation token.
 
 Finally, we go back to `Startup.cs` and register our validator, again at the very end of `ConfigureServices` (specifically, after the line where we register the cache):
 
@@ -242,29 +244,9 @@ services.AddScoped<AuthenticationStateProvider, BlazorServerAuthState>();
 
 I added a bit of debug logging -- something to show the result of the `IsAuthenticated` check in the _Host `OnGet` handler, and various bits of information about the caching and validation process. I also set the login `ExpiresUtc` to just 30 seconds so that I wouldn't have to wait to see a five minute expiration in action. Here is the result using the IdentityServer demo site's "alice" local account:
 
-```
-_Host OnGet IsAuth? False
+![Debug Output](/assets/2019/12-16/debug_output.png)
 
-_Host OnGet IsAuth? True
-sid: niKfODzcc_GqJGTZ9e4LjA
-Caching sid: niKfODzcc_GqJGTZ9e4LjA
-
-Validate: Alice Smith / niKfODzcc_GqJGTZ9e4LjA
-NowUtc: 2019-12-15T15:49:31.9295878+00:00
-ExpUtc: 2019-12-15T15:49:44.0000000+00:00
-
-Validate: Alice Smith / niKfODzcc_GqJGTZ9e4LjA
-NowUtc: 2019-12-15T15:49:41.9384264+00:00
-ExpUtc: 2019-12-15T15:49:44.0000000+00:00
-
-Validate: Alice Smith / niKfODzcc_GqJGTZ9e4LjA
-NowUtc: 2019-12-15T15:49:51.9600376+00:00
-ExpUtc: 2019-12-15T15:49:44.0000000+00:00
-*** EXPIRED ***
-Removing sid: niKfODzcc_GqJGTZ9e4LjA
-```
-
-This was encouraging, but I noticed something a little strange: the Blazor UI didn't respond to this. The login identity was gone, because the `Index.razor` page showed "Hello," at the top where a user name should appear, but I could still navigate to the various Razor component pages.
+This was encouraging, but I noticed something a little strange: the Blazor UI didn't respond to this. The login identity was gone, because the `Index.razor` page showed "Hello," at the top (where an authenticated user name should appear), but I could still navigate to the various Razor component pages.
 
 ## More Bad Advice
 
@@ -280,7 +262,7 @@ services.AddMvcCore(options =>
 });
 ```
 
-In an MVC program, this will require authentication througout the application by default, and every reasonable-looking attempt I've found online to get OIDC working with Blazor includes that snippet. Unfortunately, it's wrong, Blazor completely ignores this. You don't need it. In a project like ours, it _does_ apply the policy to the `_Host.cshtml` file because "real" Razor Pages live in MVC-land, but we reverse that with `[AllowAnonymous]` attribute, so it's useless to us. The `[AllowAnonymous]` attribute we added in the previous article is also not needed when the code above is removed.
+In an MVC program, this will require authentication througout the application by default, and every reasonable-looking attempt I've found online to get OIDC working with Blazor includes that snippet. Unfortunately, it's wrong, Blazor completely ignores this. You don't need it. In a project like ours, it _does_ apply the policy to the `_Host.cshtml` file because "real" Razor Pages live in MVC-land, but we disable that policy with an `[AllowAnonymous]` attribute, so it's useless to us. Consequently, the `[AllowAnonymous]` attribute we added in the previous article is also not needed when the code above is removed.
 
 The downside is that Blazor currently has no way to require authenticated users for every page, at least not officially. In theory, you have to add this to the top of every `.razor` page in a Blazor application:
 
@@ -292,13 +274,13 @@ Not ideal, to say the least.
 
 (As an aside, I've always wondered why the attribute is "authorize" rather than "authenticate". I suppose it's a side effect of the policies being driven by authorizations (entitlements/permissions), but in general the use of each term seems a bit mixed up within the various class names and namespaces in .NET security overall.)
 
-I did find a hack that seems to work: you can add the attribute to the `_Imports.razor` file, which is applied to every page and component in the app. The file is intended to contain `using` statements, but it works.
+I did find a hack that seems to work: you can add the attribute just once in the `_Imports.razor` file instead, because it is applied to every page and component in the app. The file is intended to contain `using` statements, but it works.
 
-Unfortunately the Blazor response to de-authentication isn't ideal either.
+Unfortunately the Blazor template's reaction to de-authentication isn't ideal either.
 
 ## Second Test Run
 
-After adding `[Authorize]` to `_Imports.razor` and running the test again, when the validator expires the login, the UI _immediately_ changes to show this:
+After adding `[Authorize]` to `_Imports.razor` and running the test again, when the validator expires the login, the UI _immediately_ changes to show this... no navigation required:
 
 ![Not Authorized](/assets/2019/12-16/not_authorized.png)
 
@@ -308,9 +290,11 @@ That comes from the `<NotAuthorized>` section of `App.razor`, which is wired up 
 
 ## Fixing Automatic Logout
 
-Look at the screenshot of the UI again carefully. Notice that only the `Index.razor` area shows the message, even though the `[Authorize]` attribute is in `_Imports.razor` which should apply everywhere. The sidebar navigation menu is still there and active. I imagine this is a bug and I will open an issue about it, presumably the entire app UI should be re-rendered.
+Look at the screenshot of the UI again carefully. Notice that only the `Index.razor` area shows the message, even though the `[Authorize]` attribute is in `_Imports.razor` which should apply everywhere. The sidebar navigation menu is still there and active because it's part of `MainLayout.razor` which is external to `<NotAuthorized>`. I didn't check whether the auth tags work further up the hierarchy because there is a bigger problem.
 
-Worse, the user isn't _really_ logged out at this point. Like the January 2018 article about IdentityServer logout, only the user's local login cookie is removed -- the user is still logged in, as far as Identity Server is concerned. We can kill two birds with one stone by changing the `<NotAuthorized>` section of `App.razor`:
+The user isn't _really_ logged out at this point. Like the January 2018 article about IdentityServer logout, only the user's local login cookie is removed -- the user is still logged in, as far as Identity Server is concerned.
+
+We can kill two birds with one stone by changing the `<NotAuthorized>` section of `App.razor`:
 
 ```csharp
 @inject NavigationManager NavManager
@@ -320,7 +304,11 @@ Worse, the user isn't _really_ logged out at this point. Like the January 2018 a
 </NotAuthorized>
 ```
 
-This way, when the de-authentication event fires, our user will be redirected to the `_HostAuthModel` logout handler, which both ensures a clean logout _and_ replaces the entire UI with our anonymous-user content. The second argument is `forceLoad` which sends the path to the browser without checking routing rules. Without it, we'd get the `<NotFound>` content from `App.razor` because the router would not recognize `/Logoff`, since it isn't known in Blazor-land and Startup doesn't define any MVC-style routing.
+The second argument is `forceLoad` which sends the path to the browser without checking routing rules. Without it, we'd get the `<NotFound>` content from `App.razor` because the router would not recognize `/Logoff`, since it isn't known in Blazor-land and Startup doesn't define any MVC-style routing.
+
+This way, when the de-authentication event fires, our user will be redirected to the `_HostAuthModel` logout handler, which both ensures a clean logout _and_ replaces the entire UI with our anonymous-user content.
+
+From a purely technical standpoint, we're done.
 
 ## Better UX
 
@@ -331,6 +319,8 @@ A user-friendly way of dealing with this depends heavily on your user base and t
 For my real application (an enterprise-style in-house line-of-business app), I know my users log out daily and that it's ok to keep them logged in all day. We apply a 20-hour expiration, and there is additional code in the `_HostAuthModel` default handler that checks whether the user's existing login is either from a previous day or within 2 hours of expiration, since our users are typically only in the application for sessions lasting less than one hour. If either rule applies, they're redirected to the `/Logout` handler immediately, so that they begin using the app in a logged-out state.
 
 For a public-facing site, it's normal to have much longer persistent logins (days, weeks, even a full month). You might implement similar logic when the user is approaching login expiration -- either force a logout on their initial visit, or present a warning with the option to login again (by first forcing logout when the user agrees to proceed).
+
+Another option might be a custom Razor component added to `App.razor` to show a "save your work" popup warning based on a new event raised by the custom validator class when expiration is approaching.
 
 ## Conclusion
 
