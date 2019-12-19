@@ -241,6 +241,13 @@ There _is_ a way to make it work, and in the next article, that's what we'll do.
 **Update:** The follow-up article is now available: [Blazor Login Expiration with OpenID Connect]({{ site.baseurl }}{% post_url 2019-12-16-blazor-login-expiration-with-openid-connect %}).
 {: .notice--warning}
 
+## No Easy Alternatives
+
+I explored the possibility of creating a Blazor-specific OIDC authentication scheme which didn't depend on `HttpContext` or cookies at all, but unfortunately the current ASP.NET Core authentication base classes assume `HttpContext` is available (for example, it's part of the initialization call in the abstract [AuthenticationHandler](https://github.com/aspnet/AspNetCore/blob/master/src/Security/Authentication/Core/src/AuthenticationHandler.cs#L71) class). The middleware (registered via `UseAuthentication` in the `Configure` method) is also currently built upon the assumption of a primarily HTTP-oriented processing pipeline.
+
+It would still be possible to create a scheme to store credentials that isn't cookie-based, but if you have to use `HttpContext` you might as well use cookies, too. To avoid HTTP, however, would require writing a completely parallel authentication library that replicated most of the [core security](https://github.com/aspnet/AspNetCore/tree/master/src/Security/Authentication/Core/src) features of the framework -- a very non-trivial task, particularly since the architecture is not well-documented and has few comments in the code.
+
 ## Conclusion
 
 It took me a few days to puzzle my way through this, but it turned out to be pretty simple. It doesn't allow for very complex anonymous content. If your system has the opposite scenario -- it needs a few secured features but is mostly open to anonymous use -- the solution is to define specific authorization policies and decorate the secured content.
+
