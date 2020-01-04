@@ -44,7 +44,7 @@ comments:
   provider: "utterances"
   utterances:
     theme: "github-dark"
-    issue_term: "url"
+    issue_term: "title"
     label: "comment"
 
 # everything below forces line-numbering in code blocks per > https://github.com/jekyll/jekyll/issues/4619#issuecomment-191267346
