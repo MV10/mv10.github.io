@@ -38,10 +38,14 @@ author:
   avatar : "/assets/images/headshot.jpg"
   bio    : "All ya gotta do is..."
 
+# https://mmistakes.github.io/minimal-mistakes/docs/configuration/#utterances-comments
+repository: MV10/mv10.github.io
 comments:
-  provider: "disqus"
-  disqus:
-    shortname: "mv10"
+  provider: "utterances"
+  utterances:
+    theme: "github-dark"
+    issue_term: "url"
+    label: "comment"
 
 # everything below forces line-numbering in code blocks per > https://github.com/jekyll/jekyll/issues/4619#issuecomment-191267346
 markdown: kramdown
