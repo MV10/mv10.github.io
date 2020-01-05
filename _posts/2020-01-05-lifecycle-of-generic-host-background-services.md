@@ -15,7 +15,7 @@ Cleaner startup by separating execution from initialization.
 
 <!--more-->
 
-.NET Core 2.1 introduced something called the Generic Host, which is a model for hosting `Task`-based asynchronous services side-by-side. For the .NET Core 3.0 release, ASP.NET was migrated off the old (but similar) `WebHost` model to Generic Host. Like so many other parts of .NET Core, there isn't anything about Generic Host which is inherently tied to ASP.NET Core, but for some reason the team still slots is under that repository.
+.NET Core 2.1 introduced something called the Generic Host, which is a model for hosting `Task`-based asynchronous services side-by-side. For the .NET Core 3.0 release, ASP.NET was migrated off the old (but similar) `WebHost` model to Generic Host. Like so many other parts of .NET Core, there isn't anything about Generic Host which is inherently tied to ASP.NET Core, but for some reason it's still hosted in that repository.
 
 I've started using Generic Host for practically everything, even quick-and-dirty one-off console test apps. It greatly simplifies the use of standardized configuration, dependency injection, and logging -- all things that you wouldn't normally associate with "quick and dirty" tests. However, it does create a bit of overhead in that your own code also must be a hosted service to take advantage of these features.
 
@@ -91,7 +91,7 @@ public class Run5sec : BackgroundService
 
 Easy, right? A test-run looks innocent enough:
 
-```
+<pre>
 Loop250ms.ExecuteAsync
 (loop)
 Run5sec.ExecuteAsync
@@ -121,7 +121,7 @@ tick 1
 (loop)
 Run5sec calling StopApplication
 Loop250ms.ExecuteAsync token cancelled
-```
+</pre>
 
 ## Off to the Races
 
@@ -188,7 +188,7 @@ Readers familiar with `async/await` will probably question the lambda registered
 async () => await ExecuteAsync(...)
 ```
 
-This is the dreaded `async void` pattern. Microsoft tells us this is only acceptable for event-handlers. Although `Register` is technically a callback and not formally defined as a .NET event, under the hood they're the same thing (and certain older Microsoft docs sometimes say "event-handlers and callbacks" -- I suspect callbacks were dropped in response to `Func<>` becoming widely available).
+This is the dreaded `async void` pattern. Microsoft tells us this is only acceptable for event-handlers. Although `Register` is technically a callback and not formally defined as a .NET event, under the hood they're the same thing (and certain older Microsoft docs sometimes say "event-handlers _and callbacks_" -- I suspect callbacks were dropped in response to `Func<>` becoming widely available).
 
 A `Task` exists primarily to track the result of a given operation. The reason `async void` is acceptable for event-handlers and callbacks is that the _caller_ doesn't care about the result of the operation being executed. They're fire-and-forget. However, this usage pattern does introduce a serious (but easily addressed) issue that we'll discuss later.
 
@@ -266,7 +266,7 @@ public class Run5sec : CoordinatedBackgroundService
 
 No changes to `Program.Main` are required. A quick test-run (with the intermediate tick/loop output removed) shows an orderly start-up sequence with discrete initialization actions running before execution begins:
 
-```
+<pre>
 IHostedService.StartAsync for Loop250ms
 Loop250ms.InitializingAsync
 IHostedService.StartAsync for Run5sec
@@ -282,7 +282,7 @@ IHostedService.StopAsync for Run5sec
 Run5sec.StoppingAsync
 IHostedService.StopAsync for Loop250ms
 Loop250ms.StoppingAsync
-```
+</pre>
 
 ## Exception Handling
 
@@ -342,7 +342,7 @@ protected override async Task ExecuteAsync(CancellationToken appStoppingToken)
 
 The end of a test-run with the service exception handler in place looks like this:
 
-```
+<pre>
 ...
 (loop)
 Run5sec calling StopApplication
@@ -352,7 +352,7 @@ IHostedService.StopAsync for Loop250ms
 Loop250ms.StoppingAsync
 Loop250ms caught OperationCanceledException
 Loop250ms exiting
-```
+</pre>
 
 It was actually necessary to add a 250ms delay to the end of `Main`, otherwise most of the time the console service, which is also an `IHostedService` would exit before `Loop250ms` had time to write that last bit of output. But that's strictly a demo consideration.
 
