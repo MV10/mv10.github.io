@@ -2,13 +2,13 @@
 title: TITLE
 tags: personal c# .net azure ai odm java unity
 header:
-  image: "/assets/2019/mm-dd/header1280.png"
-  teaser: "/assets/2019/mm-dd/header1280.png"
+  image: "/assets/2020/mm-dd/header1280.png"
+  teaser: "/assets/2020/mm-dd/header1280.png"
 
 # standard header size is 1280 x 400
 # image paths:
-#   publish:                        (/assets/2019/mm-dd/pic.jpg)
-#   edit from _post or _templates:  (../assets/2019/mm-dd/pic.jpg)
+#   publish:                        (/assets/2020/mm-dd/pic.jpg)
+#   edit from _post or _templates:  (../assets/2020/mm-dd/pic.jpg)
 ---
 
 Initial text that will be excerpted on index page.
