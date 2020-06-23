@@ -30,3 +30,5 @@ blah blah blah
 
 Format to reference another post:
 [plaintext]({{ site.baseurl }}{% post_url 2018-01-05-identityserver-aspnetcore %})
+
+![image-alt-text](../assets/2020/mm-dd/foo.jpg)
