@@ -34,13 +34,13 @@ If you've never worked with lithium batteries, it's important to understand that
 
 In the hobbyist world there are certain ratings and terminology used for lithium batteries that you will need to understand. The battery in the header picture of this article is the largest I own and powered the large DJI camera drone for flights of about 10 or 12 minutes. We'll discuss the various technical aspects of that battery below. 
 
-#### Cells
+### Cells
 
 Although my Venom batteries don't show cell-count, the battery in the header picture is called a "4S" battery. That means it contains four cells wired in series. A single cell is actually a battery in and of itself -- almost all batteries (of any type) are actually multi-cell batteries on the inside. 
 
 If you have a lithium battery which doesn't show the cell count, you can count the colored wires connected to the "balance plug". That plug allows a charger or other device to monitor the voltage level of the individual cells. In the header picture, a battery tester is connected to the balance plug. 
 
-#### Voltage
+### Voltage
 
 Every LiPo cell has a "nominal" voltage level of 3.7V. "Nominal" just means the "at-rest" voltage of the cell. A cell can be charged to higher levels and can discharge to lower levels, but 3.7V is the reference value for comparison to other batteries. The battery in the header picture is labeled 14.8V because it contains four cells wired in series (4S). Four multiplied by 3.7V equals 14.8V.
 
@@ -50,11 +50,11 @@ In the drone world, available voltage is directly related to motor speed. Motor 
 
 In the header picture, the attached meter is showing the combined voltage of all cells at 16.0V, meaning the four cells are slightly below full-charge at 4.0V each. This type of meter will also show individual cell charge levels, which lets you check for damaged cells.
 
-#### Capacity
+### Capacity
 
 Capacity is measured in milliamp-hours, or mAh. "5000" is the mAh rating of the battery in the header picture. That's the same as 5 amp-hours, which means a healthy, fully-charged battery could continuously supply 1 amp of current for 5 hours. That's actually quite a bit of juice for such a small battery, but flight is a pretty power-intensive activity (the power-regulators on our racing drones sometimes spike to more than 125 amps, which is getting close to arc-welding levels of current, although at much lower voltages) which is why that battery only lasts about 10 minutes on a heavy camera drone.
 
-#### Discharge Ratings
+### Discharge Ratings
 
 The "C" rating on a LiPo battery tells you how quickly the battery can safely discharge. The "C" actually stands for capacity because the number (25C in the header picture) is multiplied by the battery's capacity in amps -- 5000mAh in our example, or 5A, meaning this battery can maintain a whopping 125A of current without being damaged.
 
@@ -62,7 +62,7 @@ Batteries also have a "peak" or "burst" -draw rating which is a number higher th
 
 It can be difficult to figure out the C rating your application requires. It's usually easisest to just search for what has worked for others with similar needs. There's no harm in having a higher C rating than you need, but significantly underestimating your power requirements will probably damage the battery.
 
-#### Charging Rate
+### Charging Rate
 
 Although it isn't directly listed on the battery, the 5000mAh capacity also tells you the safe recharge rate of the LiPo -- 5 amps. Similarly a 3000mAh battery could be safely charged at 3A. Similar to the discharge C rating, this is sometimes referred to as "1C charging" (1A multiplied by the mAh capacity) but since it's the same for all LiPo batteries, it usually isn't printed on the battery.
 
@@ -99,25 +99,25 @@ You'll notice my parallel boards can handle up to 6 batteries, and what isn't vi
 
 The first three rules are non-negotiable. The fourth rule is, too, unless you're like me and only charge fully-depleted batteries (meaning 3.3V or 3.2V). The fifth rule is more of a rule of thumb -- just be smart about it.
 
-#### 1. Always Match Cell-Count (S-Rating)
+### 1. Always Match Cell-Count (S-Rating)
 
 A 3S battery should only be parallel charged with other 3S batteries, never with a 2S or 4S. Mixing cell counts will lead to overcharging and damaging the smaller battery, and very possibly starting a fire.
 
-#### 2. Always Match Battery Chemistry
+### 2. Always Match Battery Chemistry
 
 Although I only use LiPo batteries, a lot of this information also applies to LiFe and Li-Ion batteries. Do not mix battery chemistries while parallel charging.
 
-#### 3. Match Battery Capacity (mAh-Rating)
+### 3. Match Battery Capacity (mAh-Rating)
 
 You should only parallel charge batteries of _similar_ capacities. It would be ok to charge a 2000mAh battery with a 2200mAh battery, but not with a 10,000mAh battery.
 
-#### 4. Match Measured Voltage (Discharge Level)
+### 4. Match Measured Voltage (Discharge Level)
 
 All the batteries charged in parallel should be discharged to the same approximate level. By the numbers, the charge state should be within 25% of each other, although this isn't a linear voltage measurement. There are charts available around the 'net, but personally I only parallel charge fully-discharged batteries (3.3V or 3.2V), so I don't have a chart handy (or use it regularly).
 
 If you violate this rule, the lower-charge battery will draw power from the higher-charged battery, probably at relatively high amperage, and probably causing damage to the lower-charge battery (the draw could easily exceed the 1C charge-rate limit).
 
-#### 5. Match Battery Age / Condition
+### 5. Match Battery Age / Condition
 
 As batteries age, their internal resistance goes up, which changes how difficult they are to recharge. You should try to keep batteries of similar age and condition together when parallel charging. The charger is "seeing" multiple batteries as if they're one big battery, so they need to consistently respond as if that is actually the case. "Condition" refers to how much use and abuse they've seen. You don't want to mix a brand new battery with one you bought a year ago and have crashed into trees twenty or thirty times.
 
@@ -127,19 +127,19 @@ It's also a good idea to avoid mixing batteries of different brands or product l
 
 These are all very important. Follow these procedures in the order shown. Be very careful that you plug all connectors in with the correct orientation. Virtually all types of power connectors are keyed and the balance plugs are keyed, but it's still possible to make momentary contact with the wrong orientation which is enough to cause a short.
 
-#### 1. Connect Power Plugs First
+### 1. Connect Power Plugs First
 
 My batteries use the yellow XT-60 connectors. Starting with the battery with the highest charge (if applicable), connect ONLY the power plug to the parallel board -- do not connect the balance plug yet. Connect the other batteries' power plugs as well. After all the power plugs are connected, _do not_ connect the balance plugs yet.
 
-#### 2. Wait Five Minutes
+### 2. Wait Five Minutes
 
 Even if your meter shows the batteries are all at the same voltage, in reality they're not exactly the same. You're giving the batteries time to self-balance their voltages through the heavier gauge power wires. You don't want them doing this through the smaller balance wires. (If you've dug up a chart and are following the 25% limit from rule 4 in the previous section, you should probably wait for as much as 10 minutes. I use five minutes because I only recharge batteries at almost the same discharge level.)
 
-#### 3. Connect Balance Plugs
+### 3. Connect Balance Plugs
 
 After the voltages have had a chance to equalize, you can connect the balance plugs to the boards. Again, pay attention to the way the plugs are keyed and oriented, you don't want to short a battery through the balance wires. After this, you can connect the parallel charging boards to the battery charger and turn on the power.
 
-#### 4. Add Battery mAh Capacities
+### 4. Add Battery mAh Capacities
 
 Every charger has different setup procedures, be sure you understand how your charger works. For mine, I enter the charging amperage and the cell count (S-rating). This is the value used in the calculations to set your charger amperage. For example, parallel charging two of the batteries shown in the header picture of this article is 5000mAH x 2 = 10000 mAh. (If I had a sufficiently powerful charger, I could set it for 3S and 10A, but based on our earlier calculations that would require a charger with at least 148W of power.)
 
