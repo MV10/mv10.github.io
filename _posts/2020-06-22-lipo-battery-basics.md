@@ -70,7 +70,7 @@ Some newer batteries advertise higher charging rates, but based on what I've rea
 
 ## Battery Charger Wattage
 
-LiPo batteries require a charger specifically designed for lithium batteries. In the toolbox picture shown earlier, you can see that I usee a [HiTec X4 AC](https://hitecrcd.com/products/chargers/discontinued-chargers-charging-accessories/x4-ac-plus-4-port-acdc-multi-charger/product). Although this charger is no longer sold, it is an example of pretty good entry-level charger. It was about $200 when new. It is rated at 50 watts per port, which limits our maximum rate of charge.
+LiPo batteries require a charger specifically designed for lithium batteries. In the toolbox picture shown earlier, you can see that I use a [HiTec X4 AC](https://hitecrcd.com/products/chargers/discontinued-chargers-charging-accessories/x4-ac-plus-4-port-acdc-multi-charger/product). Although this charger is no longer sold, it is an example of pretty good entry-level charger. It was about $200 when new. It is rated at 50 watts per port, which limits our maximum rate of charge.
 
 Wattage is determined by multiplying voltage by amperage. Using the rating information for the 4S battery in the article header, we know the nominal voltage is 14.8V and that it can charge at 1C which, based on the 5000mAh capacity is 5A. In watts this is 14.8V x 5A = 74W. This means the charger can't maintain a 1C rate of charge for this battery.
 
@@ -99,25 +99,25 @@ You'll notice my parallel boards can handle up to 6 batteries, and what isn't vi
 
 The first three rules are non-negotiable. The fourth rule is, too, unless you're like me and only charge fully-depleted batteries (meaning 3.3V or 3.2V). The fifth rule is more of a rule of thumb -- just be smart about it.
 
-#### 1: Always Match Cell-Count (S-Rating)
+#### 1. Always Match Cell-Count (S-Rating)
 
 A 3S battery should only be parallel charged with other 3S batteries, never with a 2S or 4S. Mixing cell counts will lead to overcharging and damaging the smaller battery, and very possibly starting a fire.
 
-#### 2: Always Match Battery Chemistry
+#### 2. Always Match Battery Chemistry
 
 Although I only use LiPo batteries, a lot of this information also applies to LiFe and Li-Ion batteries. Do not mix battery chemistries while parallel charging.
 
-#### 3: Match Battery Capacity (mAh-Rating)
+#### 3. Match Battery Capacity (mAh-Rating)
 
 You should only parallel charge batteries of _similar_ capacities. It would be ok to charge a 2000mAh battery with a 2200mAh battery, but not with a 10,000mAh battery.
 
-#### 4: Match Measured Voltage (Discharge Level)
+#### 4. Match Measured Voltage (Discharge Level)
 
 All the batteries charged in parallel should be discharged to the same approximate level. By the numbers, the charge state should be within 25% of each other, although this isn't a linear voltage measurement. There are charts available around the 'net, but personally I only parallel charge fully-discharged batteries (3.3V or 3.2V), so I don't have a chart handy (or use it regularly).
 
 If you violate this rule, the lower-charge battery will draw power from the higher-charged battery, probably at relatively high amperage, and probably causing damage to the lower-charge battery (the draw could easily exceed the 1C charge-rate limit).
 
-#### 5: Match Battery Age / Condition
+#### 5. Match Battery Age / Condition
 
 As batteries age, their internal resistance goes up, which changes how difficult they are to recharge. You should try to keep batteries of similar age and condition together when parallel charging. The charger is "seeing" multiple batteries as if they're one big battery, so they need to consistently respond as if that is actually the case. "Condition" refers to how much use and abuse they've seen. You don't want to mix a brand new battery with one you bought a year ago and have crashed into trees twenty or thirty times.
 
