@@ -11,7 +11,7 @@ header:
 #   edit from _post or _templates:  (../assets/2021/mm-dd/pic.jpg)
 ---
 
-Sending command line arguments to background services, and receiving a response
+Passing switches and arguments to background Windows or Linux services.
 
 <!--more-->
 
