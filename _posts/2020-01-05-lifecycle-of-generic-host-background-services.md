@@ -21,7 +21,7 @@ I've started using Generic Host for practically everything, even quick-and-dirty
 
 .NET Core provides two ways to create your own hosted service. You can implement the [`IHostedService`](https://docs.microsoft.com/en-us/dotnet/api/microsoft.extensions.hosting.ihostedservice?view=dotnet-plat-ext-3.1) interface, or you can derive from the [`BackgroundService`](https://docs.microsoft.com/en-us/dotnet/api/microsoft.extensions.hosting.backgroundservice?view=dotnet-plat-ext-3.1) abstract class. However, the out-of-the-box experience allows for start-up race conditions if your services have dependencies. I will demonstrate an alternative abstract class which avoids this by providing discrete initialization, execution, and shutdown activities.
 
-There is no repository associated with this article.
+**20201-May update:** I have created a repository for [CoordinatedBackgroundService](https://github.com/MV10/CoordinatedBackgroundService) and the demo programs in this article. I have been using this library regularly enough that I wanted to publish it as a NuGet [package](https://www.nuget.org/packages/CoordinatedBackgroundService/).
 
 ## BackgroundService
 
