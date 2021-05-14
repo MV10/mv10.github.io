@@ -1,6 +1,6 @@
 ---
 title: Storing X509 Certificates in Azure Key Vault
-tags: personal c# .net azure security identityserver x509 asp.net.core
+tags: c# .net azure security identityserver x509 asp.net.core dpapi
 header:
   image: "/assets/2018/01-10/header1280.png"
   teaser: "/assets/2018/01-10/header1280.png"
@@ -15,7 +15,11 @@ This article demonstrates storing and retrieving X.509 certificates to Azure Key
 
 <!--more-->
 
-## Update: Feb 10, 2018
+## Update
+
+The comments below are no longer accurate. In a later release of .NET Core, Microsoft added support for decryption, but I'll leave the old update because it is discussed in the comments. 
+
+In February of 2018, I added this update:
 
 **Data Protection API:** Unfortunately, this technique is not particularly useful for use with the Data Protection API. 
 {: .notice--warning}
