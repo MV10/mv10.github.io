@@ -25,7 +25,7 @@ This package gives you access to several important tools. We'll focus on three o
 
 This is the familiar `services` collection used in ASP.NET Core's `Startup` class. It stores all of the available services and various configuration details for each registered service. In DI terminology, that `Startup` process is known as the [composition root](http://blog.ploeh.dk/2011/07/28/CompositionRoot/). In practical terms, it's the place where injectable services are registered.
 
-You don't need ASP.NET to use DI. A simple console program could act as the composition root by creating an instance of this collection and using it to register services.
+You don't need ASP.NET to use DI and the `services` collection. A simple console program could act as the composition root by creating an instance of this collection and using it to register services.
 
 ```
 public class Program
@@ -95,6 +95,47 @@ namespace Example.Library.Utilities
     }
 }
 ```
+
+I'm writing the end of this section almost four years later -- a reader pointed out that I don't actually cover the usage of any of the examples shown above. I originally wrote this under the assumption that readers were already familiar with DI as it was used in ASP.NET Core, but it's easy enough to round out this section with another example. Microsoft's DI uses constructor-based injection (there are other DI techniques out there with various pros and cons). The earlier code snippet for `AddExampleAzureLibrary` registers four services:
+
+* `IGetSecret`
+* `IKeyVaultCache`
+* `IBlobStorageToken`
+* `IBlobWriter`
+
+Those examples were based on an earlier article I had written about storing data in Azure Key Vaults. Let's say you are creating a class that retrieves that data by calling a `Fetch` method on an `IGetSecret` object (ignoring that a real Azure library would use async Tasks). Elsewhere during program initialization, you would have already called `services.AddExampleAzureLibrary()` which tells DI how to associate those interfaces with their concrete implementation classes. To use it, you need only declare `IGetSecret` in the class constructor, and DI does the rest:
+
+```
+using Example.Library.Azure;
+
+namespace MySecretsProgram
+{
+    public class SecretsReader
+    {
+        // the constructor will set this
+        private IGetSecret getSecret;
+
+        // DI populates the getSecret argument
+        public SecretsReader(IGetSecret getSecret)
+        {
+            // store the reference for later use
+            this.getSecret = getSecret;
+        }
+
+        public string Read(string key)
+        {
+            // use the private reference
+            return getSecret.Fetch(key);
+        }
+    }
+}
+```
+
+(Side note: when I wrote the article in 2018, I tended to prefix the constructor arguments with `di`, but the technique shown above -- using the same name for the argument and the private reference, and differentiating with the `this` keyword -- has become popular over the years and it is my preference.)
+
+Now, in order for DI to populate the constructor argument, that means DI must instantiate the class you just created. Ideally, this means `SecretsReader` would _also_ be registered as a service, and any other class which needs that object would also use injection to obtain a reference. Similar to async/await, the use of DI tends to have a ripple effect -- it is usually easiest to use DI everywhere, top to bottom (which is part of the reason I wrote this article, it's nice if "top to bottom" includes your stand-alone libraries). But arguably, there are exceptions, which is a nice segue to the next section of the original article...
+
+_(My thanks to Gary D. for suggesting the additional clarification.)_
 
 ## Embrace the Anti-Pattern
 
