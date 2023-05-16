@@ -2,13 +2,13 @@
 title: TITLE
 tags: personal c# .net azure ai odm java unity
 header:
-  image: "/assets/2021/mm-dd/header1280.png"
-  teaser: "/assets/2021/mm-dd/header1280.png"
+  image: "/assets/2023/mm-dd/header1280.png"
+  teaser: "/assets/2023/mm-dd/header1280.png"
 
 # standard header size is 1280 x 400
 # image paths:
-#   publish:                        (/assets/2021/mm-dd/pic.jpg)
-#   edit from _post or _templates:  (../assets/2021/mm-dd/pic.jpg)
+#   publish:                        (/assets/2023/mm-dd/pic.jpg)
+#   edit from _post or _templates:  (../assets/2023/mm-dd/pic.jpg)
 ---
 
 Initial text that will be excerpted on index page.
@@ -31,4 +31,5 @@ blah blah blah
 Format to reference another post:
 [plaintext]({{ site.baseurl }}{% post_url 2018-01-05-identityserver-aspnetcore %})
 
-![image-alt-text](../assets/2021/mm-dd/foo.jpg)
+![image-alt-text](../assets/2023/mm-dd/foo.jpg)
+
