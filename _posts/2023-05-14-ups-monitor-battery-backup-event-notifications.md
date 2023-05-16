@@ -1,5 +1,5 @@
 ---
-title: UPS Monitor: Battery Backup Event Notifications
+title: UPS Monitor - Battery Backup Event Notifications
 tags: c# .net windows service ups battery wmi cim
 header:
   image: "/assets/2023/05-14/header1280.jpg"
