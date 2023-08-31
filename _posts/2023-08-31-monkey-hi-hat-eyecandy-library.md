@@ -108,7 +108,7 @@ In addition to the source code organization, the library uses three library pack
 
 * _OpenTK_ is the real star of the show. The [OpenTK](https://github.com/opentk/opentk) library provides high-quality (but lightweight!) wrappers around the OpenGL and OpenAL (audio) APIs. It also wraps the GLFW API, which provides OpenGL-based cross-platform windowing and input support (keyboard, mouse, etc).
 * _FftSharp_ is a fast, simple, handy [utility-library](https://github.com/swharden/FftSharp) for performing Fast Fourier Transforms. These are necessary to generate frequency data (decibels and magnitude).
-* The standard _Microsoft.Extensions.Logging_ library is also used. Wiring this up is completely optional, but if you do, I very strongly recommend the excellent [Serilog](https://serilog.net/) libraries. Monkey Hi Hat has an interesting zero-configuration [LogHelper](https://github.com/MV10/monkey-hi-hat/blob/master/mhh/mhh/Utils/LogHelper.cs) class which makes basic Serilog integration totally painless.
+* The standard _Microsoft.Extensions.Logging_ library is also used. Wiring this up is completely optional, but if you do, I very strongly recommend the excellent [Serilog](https://serilog.net/) libraries. Monkey Hi Hat has a very basic zero-configuration [LogHelper](https://github.com/MV10/monkey-hi-hat/blob/master/mhh/mhh/Utils/LogHelper.cs) class which makes basic Serilog integration totally painless.
 
 ## Conclusion
 
