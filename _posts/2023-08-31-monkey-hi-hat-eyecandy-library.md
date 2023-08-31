@@ -85,7 +85,7 @@ I assume readers of my blog will already have .NET installed, but the .NET6 runt
 
 ## General Library Usage
 
-Once again I will recommend the repository's [Windowed Usage](https://github.com/MV10/eyecandy/wiki/3:-Windowed-Usage) and [Audio-Only Usage](https://github.com/MV10/eyecandy/wiki/4:-Audio%E2%80%90Only-Usage) wiki pages, but as those topics suggest, the library supports at least two usage scenarios.
+Once again I will recommend the repository's wiki pages, specifically [Windowed Usage](https://github.com/MV10/eyecandy/wiki/3:-Windowed-Usage) and [Audio-Only Usage](https://github.com/MV10/eyecandy/wiki/4:-Audio%E2%80%90Only-Usage), but as those topics suggest, the library supports at least two usage scenarios.
 
 Audio-only usage involves pointing the library's `AudioCaptureProcessor` at an audio input device, defining a callback for notification when new audio data is available, and reading and using the data however you wish.
 
@@ -98,7 +98,7 @@ The library offers a `demo` project which contains a variety of utilities and sa
 If you dig into the `eyecandy` directories at the source repo, you'll find that the library code is organized under four directories:
 
 * `Audio` is where most of the work is done -- audio capture and managing the processing of audio data into OpenGL textures.
-* `AudioTextures` contains the base class and the individual audio texture classes mentioned earlier in this article. Each of these do the actual conversion work when new audio samples are available.
+* `AudioTextures` contains the base class and the individual audio texture classes mentioned earlier in this article. Each of these do the actual conversion work when new audio samples are available. I have thought about offering plugin support, but I'm not sure there are many other rational interpretations of the audio data to make the effort worthwhile. If you have ideas, please definitely drop me a note. A PR to create a new class might make more sense.
 * `Utils` is where enumerations are defined, error logging is handled, and the library's two configuration classes are defined.
 * `Visual` holds the library's two helper classes -- the windowing base class, and a shader-management class.
 
@@ -106,9 +106,9 @@ If you dig into the `eyecandy` directories at the source repo, you'll find that 
 
 In addition to the source code organization, the library uses three library packages:
 
-* `OpenTK` is the real star of the show. The [OpenTK](https://github.com/opentk/opentk) library provides high-quality (but lightweight!) wrappers around the OpenGL and OpenAL (audio) APIs. It also wraps the GLFW API, which provides OpenGL-based cross-platform windowing and input support (keyboard, mouse, etc).
-* `FftSharp` is a fast, simple, handy [utility-library](https://github.com/swharden/FftSharp) for performing Fast Fourier Transforms. These are necessary to generate frequency data (decibels and magnitude).
-* The standard Microsoft logging library is also used. Wiring this up is completely optional, but if you do, I very strongly recommend the excellent [Serilog](https://serilog.net/) libraries.
+* _OpenTK_ is the real star of the show. The [OpenTK](https://github.com/opentk/opentk) library provides high-quality (but lightweight!) wrappers around the OpenGL and OpenAL (audio) APIs. It also wraps the GLFW API, which provides OpenGL-based cross-platform windowing and input support (keyboard, mouse, etc).
+* _FftSharp_ is a fast, simple, handy [utility-library](https://github.com/swharden/FftSharp) for performing Fast Fourier Transforms. These are necessary to generate frequency data (decibels and magnitude).
+* The standard _Microsoft.Extensions.Logging_ library is also used. Wiring this up is completely optional, but if you do, I very strongly recommend the excellent [Serilog](https://serilog.net/) libraries. Monkey Hi Hat has an interesting zero-configuration [LogHelper](https://github.com/MV10/monkey-hi-hat/blob/master/mhh/mhh/Utils/LogHelper.cs) class which makes basic Serilog integration totally painless.
 
 ## Conclusion
 
