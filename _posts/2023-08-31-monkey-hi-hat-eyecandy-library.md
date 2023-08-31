@@ -35,7 +35,7 @@ Recently, my wife discovered [VertextShaderArt](https://www.vertexshaderart.com)
 
 But these sites are limited. While they have cool things to see, it gets a little dull watching just one viz. Also, WebGL performance is relatively poor, and over time the browsers themselves tend to crash. Neat stuff, often impressive, but "not the droid I'm looking for."
 
-![obi-wan](../assets/2023/08-31/obiwan.jpg)
+![obi-wan](/assets/2023/08-31/obiwan.jpg)
 
 I should also mention an important third example, which is [ButterChurn](https://butterchurnviz.com/). Although it isn't readily open to user-written creations like Shadertoy and VSA are, and content isn't based on a standard like the GLSL shader langage, it's notable because it seeks to reproduce the famous [MilkDrop](https://www.geisswerks.com/about_milkdrop.html) WinAmp viz plugin content from 20+ years ago. Unlike the other sites, it does run through a list of different viz routines, and like MilkDrop, it also mixes and overlays them, sometimes producing truly stunning effects (unfortunately, a few of them are also boring or just plain ugly, but mostly it's pretty interesting). Sadly, it also locks up or crashes pretty regularly -- much more often than the other two.
 
