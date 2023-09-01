@@ -15,7 +15,7 @@ Understanding audio textures used by music visualizers.
 
 <!--more-->
 
-This is the next installment in a series of articles about my Monkey Hi Hat music visualizer applications, the libraries it uses, and supporting applications. You may wish to start with the earlier articles in this series:
+This is the next installment in a series of articles about my Monkey Hi Hat music visualizer application, and the supporting libraries, applications, and content. You may wish to start with the earlier articles in this series:
 
 * [Introducing the Monkey Hi Hat Music Visualizer]({{ site.baseurl }}{% post_url 2023-08-26-introducing-monkey-hi-hat-music-visualizer %})
 * [Monkey Hi Hat and the Eyecandy Library]({{ site.baseurl }}{% post_url 2023-08-31-monkey-hi-hat-eyecandy-library %})
@@ -74,7 +74,7 @@ Finally, because shader textures really were originally intended to represent gr
 
 > Eyecandy usually stores data in the _green_ channel.
 
-There is at least one exception (the 4-channel history texture, which is discussed later) but this is particularly important if you're converting shader code from some other system. For example, Shadertoy uses the red channel, and some Shadertoy code uses `x` instead of `r` which takes advantages of quirks of GLSL syntax.
+There is at least one exception (the 4-channel history texture, which is discussed later) but this is particularly important if you're converting shader code from some other system. For example, Shadertoy uses the red channel, and some Shadertoy code uses `(u,v).x` instead of `(u,v).r` which takes advantages of quirks of GLSL syntax (so-called "twizzling").
 
 The library exclusively uses normalized floats for audio texture data, so the data stored in each color channel is also in the 0.0 to 1.0 range.
 
@@ -102,7 +102,7 @@ The library also offers three audio textures that warrant a bit of explanation.
 
 ### `AudioTexture4ChannelHistory`
 
-This one doesn't lend itself well to direct visualization. Whereas most Eyecandy audio textures store data exclusively in the green channel, this class stores multiple types of data in each of the four RGBA channels. Red is volume, green is PCM wave data, blue is frequency using the magnitude scale, and alpha is frequency using the decibel scale..
+This one doesn't lend itself well to direct visualization. Whereas most Eyecandy audio textures store data exclusively in the green channel, this class stores multiple types of data in each of the four RGBA channels. Red is volume, green is PCM wave data, blue is frequency using the magnitude scale, and alpha is frequency using the decibel scale.
 
 ![fourchannel](/assets/2023/09-01/fourchannel.jpg)
 
@@ -114,7 +114,7 @@ The WebAudio API defines a "time smoothing" algorithm applied to decibel-scale f
 
 ### `AudioTextureShadertoy`
 
-As noted earlier, the Shadertoy data isn't a history texture. Instead, row 0 contains WebAudio-style decibel frequency data, and row 1 contains PCM wave data. As such, it doesn't help to _directly_ dump the texture to a window. Instead, this is a real Shadertoy shader that draws both data elements. The top is PCM wave data, and the bottom is the frequency data.
+As noted earlier, the Shadertoy data isn't a history texture. Instead, row 0 contains WebAudio-style decibel frequency data, and row 1 contains PCM wave data. As such, it doesn't help to _directly_ dump the texture to a window since you'd only see two faintly-pulsing lines, one on top of the other. Instead, this is a real Shadertoy shader that draws both data elements. The red line on top is PCM wave data, and the green output at the bottom is the frequency data.
 
 ![shadertoy](/assets/2023/09-01/shadertoy.jpg)
 
