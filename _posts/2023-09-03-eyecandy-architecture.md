@@ -96,9 +96,11 @@ Because these calls are in response to the audio capture background thread, it i
 
 Most of the textures are quite simple. `AudioTextureVolumeHistory` only has six lines of code (ignoring comments, method declarations, etc.). Only `AudioTextureShadertoy` has any real logic inside owing to the fact that Eyecandy uses textures which are 1024 pixels wide, but Shadertoy only uses the first 512 elements of the 1024 elements of frequency data.
 
+I have considered adding plugin support for additional audio textures, but I'm having a hard time imagining what else might be usefully done with the audio data -- and true plugin management is still kind of hairy (although these are extremely simple objects).
+
 ## Conclusion
 
-And that is a whirlwind tour of the Eyecandy library. There is also a relatively trivial `BaseWindow` class that handles a few minor UI chores, and the `Shader` class which just loads, compiles, and verifies vertex and fragment shader source files, and offers some helpful utility functions, but they're self-explanatory.
+And thus concludes the whirlwind tour of the Eyecandy library. There is also a relatively trivial `BaseWindow` class that handles a few minor UI chores, and the `Shader` class which just loads, compiles, and verifies vertex and fragment shader source files, and offers some helpful utility functions, but they're self-explanatory.
 
 In the next installment, we'll take a look at the Monkey Hi Hat program itself.
 
