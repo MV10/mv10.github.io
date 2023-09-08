@@ -34,3 +34,17 @@ Some configuration steps are required, so be sure to check the Windows and Linux
 I'll be writing several articles about these programs and their constitutent libraries. Many technologies are covered, ranging from OpenAL audio capture, to OpenGL shaders, updates to my own [CommandLineSwitchPipe](https://github.com/MV10/CommandLineSwitchPipe) library, and even the relatively new .NET MAUI cross-platform user interface framework.
 
 Meanwhile, there is a huge amount of information in the README and wiki pages of each of the repositories mentioned above that should keep the technically-curious busy for some time.
+
+## Update: Article Links and Version 2.0
+
+On Sept 8th, I released version 2.0, which is a fairly major upgrade. I reorganized a lot of the code to improve maintainability, performance, and to support some features I'd like to implement later. I also added a smooth crossfade between visualizations, and support for more complex "multi-pass" visualizations. The afforementioned deprecation of Raspberry Pi support and also anything 32-bit or OpenGL older than 4.6 is in effect. I do intend to support modern Linux devices, I just haven't had time to do any builds or testing.
+
+Here are the available articles relating to this application:
+
+* [Monkey Hi Hat and the Eyecandy Library (Aug-31)]({{ site.baseurl }}{% post_url 2023-08-31-monkey-hi-hat-eyecandy-library %})
+* [Monkey Hi Hat and Eyecandy Audio Textures (Sep-01)]({{ site.baseurl }}{% post_url 2023-09-01-monkey-hi-hat-eyecandy-audio-textures %})
+* [Architecture of the Eyecandy Library]({{ site.baseurl }}{% post_url 2023-09-03-eyecandy-architecture %})
+
+Planned articles will cover the internal workings of Monkey Hi Hat, a discussion of the new multi-pass feature and what it means for future effects, and look at the .NET MAUI-based Monkey Droid graphical remote-control program.
+
+I hope folks out there discover and enjoy this application -- and let me hear about it!
