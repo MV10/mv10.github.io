@@ -165,7 +165,7 @@ And that's all it takes from the visualization-creation standpoint.
 
 ## The Implementation
 
-In my previous article, [Inside Monkey Hi Hat]({{ site.baseurl }}{% post_url 2023-09-08-inside-monkey-hi-hat %}), I purposely ignored the details of multi-pass rendering because it's relatively complicated. That article explains that a `RenderManager` creates an interacts with `IRenderer` objects, and `MultipassRenderer` implements that interface. Like the single-pass renderer, the constructor receives a `VisualizerConfig` object, which the manager noted contains a `[multipass]` section.
+In my previous article, [Inside Monkey Hi Hat]({{ site.baseurl }}{% post_url 2023-09-08-inside-monkey-hi-hat %}), I purposely ignored the details of multi-pass rendering because it's relatively complicated. That article explains that a `RenderManager` creates and interacts with `IRenderer` objects, and `MultipassRenderer` implements that interface. Like the single-pass renderer, the constructor receives a `VisualizerConfig` object, which the manager noted contains a `[multipass]` section.
 
 A method called `ParseMultipassConfig` handles parsing and validating everything described in the previous section. Each pass populates a `MultipassDrawCall` object which has two groups of fields. The first group represents data used during rendering: buffer and texture handles, texture unit assignments, the compiled shader, and the visualizer object. The second group represents data used during this parsing and initialization process -- the draw buffer number, and a list of input buffer numbers. These are stored in a class-level field called `DrawCalls` (which is a commonly-used term for what we've been referring to as a "pass").
 
