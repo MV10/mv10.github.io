@@ -43,9 +43,9 @@ Here are the available and planned articles relating to this application:
 
 * [Monkey Hi Hat and the Eyecandy Library (Aug-31)]({{ site.baseurl }}{% post_url 2023-08-31-monkey-hi-hat-eyecandy-library %})
 * [Monkey Hi Hat and Eyecandy Audio Textures (Sep-01)]({{ site.baseurl }}{% post_url 2023-09-01-monkey-hi-hat-eyecandy-audio-textures %})
-* [Architecture of the Eyecandy Library]({{ site.baseurl }}{% post_url 2023-09-03-eyecandy-architecture %})
-* [Inside the Monkey Hi Hat Music Visualizer]({{ site.baseurl }}{% post_url 2023-09-08-inside-monkey-hi-hat %})
-* [Monkey Hi Hat Multi-Pass Rendering]({{ site.baseurl }}{% post_url 2023-09-09-monkey-hi-hat-multi-pass-rendering %})
+* [Architecture of the Eyecandy Library (Sep-03)]({{ site.baseurl }}{% post_url 2023-09-03-eyecandy-architecture %})
+* [Inside the Monkey Hi Hat Music Visualizer (Sep-08)]({{ site.baseurl }}{% post_url 2023-09-08-inside-monkey-hi-hat %})
+* [Monkey Hi Hat Multi-Pass Rendering (Sep-09)]({{ site.baseurl }}{% post_url 2023-09-09-monkey-hi-hat-multi-pass-rendering %})
 * Monkey Droid GUI for Monkey Hi Hat Music Visualizer
 * TCP Support for CommandLineSwitchPipe
 
