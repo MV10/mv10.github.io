@@ -15,7 +15,7 @@ How framebuffer-based multi-stage post-processing works.
 
 <!--more-->
 
-I've been writing a series of articles about my new Monkey Hi Hat music visualizer, starting with the introductory [article]({{ site.baseurl }}{% post_url 2023-08-26-introducing-monkey-hi-hat-music-visualizer %}) a few weeks ago. Since then, I've made some pretty significant improvements, including a version 2 release just a couple of days ago, which includes an important new feature: multi-pass rendering. See the previous articles for other details about Monkey Hi Hat and the various libraries, this article is focused on multi-pass.
+I've been writing a series of articles about my new Monkey Hi Hat music visualizer ([repo](https://github.com/MV10/monkey-hi-hat) and [releases](https://github.com/MV10/monkey-hi-hat/releases)), starting with the introductory [article]({{ site.baseurl }}{% post_url 2023-08-26-introducing-monkey-hi-hat-music-visualizer %}) a few weeks ago. Since then, I've made some pretty significant improvements, including a version 2 release just a couple of days ago, which includes an important new feature: multi-pass rendering. See the previous articles for other details about Monkey Hi Hat and the various libraries, this article is focused on multi-pass.
 
 I have also created a stand-alone example in my [opentk-multipass-demo](https://github.com/MV10/opentk-multipass-demo) repository which, as the name suggests, is primarily "pure" OpenTK (the exception being the conveneince of the `Shader` class from my [eyecandy](https://github.com/MV10/eyecandy) library, since the details of loading and compiling shaders is irrelevant to the technique.) Since that example also lets the user view the results of any stage of processing, I'm using it for some of the screenshots in this article. (Currently Monkey Hi Hat has no such facility, although that is planned, it's handy for visualizer debugging.)
 
@@ -31,19 +31,19 @@ Anyway, on to the good stuff.
 
 ## Pretty Pictures
 
-So what is this all about? The background of the article header includes a screenshot from the output of the multipass demo repository, but the demo repo's README has this full screenshot, unsullied by the presence of Corbin Dallas and Leeloo:
+So what is this all about? The background of the article header includes a screenshot from the output of the multipass demo repository, but the demo repo's README has this full screenshot, sans Corbin Dallas and Leeloo:
 
 ![multipass-rendering](https://user-images.githubusercontent.com/794270/264474741-bb948f00-0bc4-4040-9ca0-082e005bdc3f.png)
 
 That output is the result of _five_ rendering passes -- which means five different shaders. This is why Mr. Snooty on StackOverflow feigns puzzlement over the term "multipass shader" -- the rendering _process_ might be multipass, but the _shaders_ are not. Other common terms for this are post-processing, post-effects, or post-FX, although that has traditionally been more about video and photography than computer graphics. Game engines in particular have popularized those terms for rendering, as they often supply generic special-effect renderers like "film grain" or "CRT scanlines" -- all of which could be rendered now by Monkey Hi Hat.
 
-In this demo, these are the five stages:
+In this demo, these are the five stages, four of which were adpated from Shadertoy code for expediency, since my focus is the application, not the shaders:
 
-* Render a plasma field (credit: klk's [Simple Plasma](https://www.shadertoy.com/view/XsVSzW
+* Render a plasma field (credit:[Simple Plasma](https://www.shadertoy.com/view/XsVSzW
 ))
-* Desaturate (grayscale) the plasma field output (credit: sepehr's [Desaturate filter](https://www.shadertoy.com/view/lsdXDH))
-* Apply a Sobel edge-detection algorithm (credit: IBets' [Sobel Operator 2D](https://www.shadertoy.com/view/wtVGzh))
-* Overlay a cloud-border effect (credit: k_mouse's [Foamy Water](https://www.shadertoy.com/view/llcXW7))
+* Desaturate (grayscale) that output (credit: [Desaturate filter](https://www.shadertoy.com/view/lsdXDH))
+* Apply Sobel edge-detection (credit: [Sobel Operator 2D](https://www.shadertoy.com/view/wtVGzh))
+* Overlay a cloud border effect (credit: [Foamy Water](https://www.shadertoy.com/view/llcXW7))
 * Use the original plasma field output to colorize the result (credit: _me_)
 
 The neat thing about the stand-alone multipass demo is that you can hit the spacebar to "interrupt" the processing stages at any point and output the results of that stage to the screen. Here are the five stages described above:
@@ -57,10 +57,10 @@ The neat thing about the stand-alone multipass demo is that you can hit the spac
 #### Pass 3: Sobel Edge-Detection
 ![pass3](/assets/2023/09-09/pass3.png)
 
-#### Pass 4: Mix in Cloud Borders
+#### Pass 4: Add Cloud Border Overlay
 ![pass4](/assets/2023/09-09/pass4.png)
 
-#### Pass 5: Colorization
+#### Pass 5: Colorize from Original Buffer
 ![pass5](/assets/2023/09-09/pass5.png)
 
 Now that you've seen the result of these render passes, we'll quickly discuss the basic concept.
@@ -211,6 +211,6 @@ That concludes my articles about the Monkey Hi Hat music visualizer itself, alth
 
 If you were here simply to learn about multipass rendering, you should check out the demo repository mentioned at the start. Even if you aren't using the OpenTK .NET wrapper, you won't have any difficulty translating that into true OpenGL calls in C or C++, or using any other reasonably-thin GL wrapper to do the same thing.
 
-Hope you found it useful and interesting -- and that you enjoy Monkey Hi Hat and...
+I hope that you enjoy Monkey Hi Hat and...
 
 ![leeloo-multipass](/assets/2023/09-09/multipass.gif)
