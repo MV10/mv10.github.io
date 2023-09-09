@@ -135,12 +135,12 @@ FragmentShaderFilename=fine-scale-plasma.frag
 ```
 
 #### Column 1: Draw Buffer
-The first column declares the draw-buffer number. These must begin at 0 and must not be declared with any gaps. If you've drawn to buffers 0 and 1, you can't draw to buffer 3 yet because you haven't drawn to buffer 2.
+The first column declares the draw-buffer number. These must begin at 0 and must not be declared with any gaps. If you've drawn to buffers 0 and 1, you can't draw to buffer 3 yet because you haven't drawn to buffer 2. But, as you can see above, you can draw to any already-used buffer in any order.
 
-This probably rasises the question, "How many buffers can I use?" and the answer is, "Don't worry about it." They're allocated on the fly and you're probably going to choke the GPU before you could use enough buffers to matter. I'll discuss it more later, but the true resource limitation are OpenGL texture units, and on my card with 192 available, a visualizer with 20 passes or more wouldn't come close to those limits (assuming it could handle that much work without destroying the frame rate).
+This probably rasises the question, "How many buffers can I use?" and the answer is, "Don't worry about it." They're allocated on the fly and you're probably going to choke the GPU before you could use enough buffers to matter. I'll discuss it more later, but the true resource limitation is OpenGL texture units, and on my card with 192 available, a visualizer with 20 passes or more wouldn't come close to those limits (assuming it could handle that much work and store that many full-screen textures without destroying the frame rate).
 
 #### Column 2: Input Buffers
-The second column declares comma-separated input-buffer numbers, or an asterisk to indicate the pass does not use any input buffers. For obvious reasons, you can only declare input buffers which have been drawn into previously, and you can't declare a buffer as both the draw buffer and an input buffer.
+The second column declares comma-separated input-buffer numbers, or an asterisk to indicate the pass does not use any input buffers. For obvious reasons, you can only declare input buffers which have been drawn into previously, and you can't declare a buffer as both the draw buffer and an input buffer on the same pass.
 
 #### Columns 3 and 4: Shader Filenames
 The third and fourth columns are the names of vertex and fragment shader files (in that order). The `.vert` or `.frag` extensions are added automatically and the full shader pathspec is searched. If you specify an asterisk, the pass will use the shader(s) declared in the configuration file's `[shader]` section.
@@ -165,9 +165,27 @@ And that's all it takes from the visualization-creation standpoint.
 
 ## The Implementation
 
-In my previous article, [Inside Monkey Hi Hat]({{ site.baseurl }}{% post_url 2023-09-08-inside-monkey-hi-hat %}), I purposely ignored the details of multi-pass rendering because it's relatively complicated. That article explains that a `RenderManager` creates and interacts with `IRenderer` objects, and `MultipassRenderer` implements that interface. Like the single-pass renderer, the constructor receives a `VisualizerConfig` object, which the manager noted contains a `[multipass]` section.
+In my previous article, [Inside Monkey Hi Hat]({{ site.baseurl }}{% post_url 2023-09-08-inside-monkey-hi-hat %}), I purposely ignored the details of multi-pass rendering because it's relatively complicated. That article explains that a `RenderManager` creates and interacts with `IRenderer` objects, and `MultipassRenderer` implements that interface. When `RenderManager` finds a `[multipass]` section in the configuration, it creates this type of render. Like the single-pass renderer, the constructor receives a `VisualizerConfig` object.
 
-A method called `ParseMultipassConfig` handles parsing and validating everything described in the previous section. Each pass populates a `MultipassDrawCall` object which has two groups of fields. The first group represents data used during rendering: buffer and texture handles, texture unit assignments, the compiled shader, and the visualizer object. The second group represents data used during this parsing and initialization process -- the draw buffer number, and a list of input buffer numbers. These are stored in a class-level field called `DrawCalls` (which is a commonly-used term for what we've been referring to as a "pass").
+A method called `ParseMultipassConfig` handles parsing and validating everything described in the previous section. Each pass populates a `MultipassDrawCall` object which has two groups of fields:
+
+```csharp
+public class MultipassDrawCall
+{
+    // Data used during rendering
+    public int DrawBufferHandle;
+    public List<int> InputTextureHandle;
+    public List<TextureUnit> InputTextureUnit;
+    public CachedShader Shader;
+    public IVisualizer Visualizer;
+
+    // Data collected during parsing
+    public int DrawBufferIndex;
+    public List<int> InputBufferIndex;
+}
+```
+
+As the comments indicate, the first group represents data used during rendering, and the second group represents data used during this parsing and initialization process -- the "index" values are the draw and input buffer numbers used in the `[multipass]` section. These objects are stored in a class-level collection called `DrawCalls` (a "draw call" is a commonly-used term for what we've been referring to as a "pass" because the final OpenGL command is some variation on `glDraw`).
 
 When that list is complete, the parser knows how many buffers are required, and it passes this to the program's `GLResourceManager`, which returns a list of allocated framebuffers, attached textures, and texture unit assignments. The previous article explained how and why these are treated as "scarce resources" but momentarily we'll discuss a few additional considerations.
 
@@ -179,7 +197,7 @@ Finally, a few lines of code blits the final draw buffer's texture to OpenGL's b
 
 ## Crossfade Support
 
-The previous article also mentioned that the new feature which applies a crossfade effect when a new visualizer has been loaded. It does this by "intercepting" the output of the old and new renderers, so that it can "mix" them before sending the output to the display. I didn't want to hard-code a dependency on `SingleVisualizerRenderer` versus `MultipassRenderer`, so instead it looks for an interface called `IFramebufferOwner`, which indicates that the renderer explicitly allocates framebuffers and associated resources.
+The previous article also mentioned a new crossfade effect when a new visualizer has been loaded. It does this by "intercepting" the output of the old and new renderers, so that it can "mix" them before sending the output to the display. To do this, it needs to know how to find the renderer output. I didn't want to hard-code a dependency on specific renderer types, so instead it looks for an interface called `IFramebufferOwner`, which indicates that the renderer explicitly allocates framebuffers and associated resources.
 
 During initialization, the crossfade renderer stores references to either internally-owned resources (framebuffer and texture handles, and texture units) or to the final draw call resources owned by the renderer. That interface requires a `GetFinalDrawTargetResource` method which returns the `GLResources` object used during the last draw call, which is where that `OutputFramebuffer` field in the multipass shader comes into play. The method also takes an `interceptActive` argument which a multi-pass renderer can use to skip the final operations to copy (blit) the last draw buffer to OpenGL's back buffer, as these are relatively expensive operations, and they're unnecessary because the multi-pass renderer isn't directly outputting the results to the screen during crossfade.
 
@@ -191,7 +209,7 @@ Earlier I mentioned you don't realistically need to worry about how many draw bu
 
 The previous article explained that there is an upper limit on the total number of texture units supported by a given graphics card, and also that they should be carefully and permanently allocated to a given texture buffer, since they represent storage slots, and changing these will result in large memory copy operations. This is one of the main reasons the `GLResourceManager` class was created.
 
-There is also the problem that crossfade implies up to three multipass rendering operations could be happening at once -- the old renderer, the new renderer, and the crossfade render itself. Since the multipass renderers represent their buffer requirements as simple 0-based index values, a higher level of abstraction was needed to make sure those index values point to discrete underlying OpenGL resources.
+There is also the problem that crossfade implies up to three multipass rendering operations could be happening at once -- the old renderer, the new renderer, and the crossfade render itself. Since the multipass renderers represent their buffer requirements as simple 0-based index values, a higher level of abstraction was needed to make sure those index values point to discrete underlying OpenGL resources. In other words, both the old and new renderers will declare a buffer 0, buffer 1, and so on, so the program can't simply use texture unit 0 and texture unit 1 for both renderers (at least, not efficiently).
 
 That article also explains that the eyecandy library "reserves" the seven highest-numbered texture units for audio texture usage. Two more are allocated whenever crossfade is active, and all the rest are available for visualizer usage. However, crossfade also implies that two multipass shaders might temporarily run at the same time, so really half of the remainder is available for any given visualizer.
 
