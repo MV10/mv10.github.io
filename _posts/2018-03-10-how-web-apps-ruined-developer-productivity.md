@@ -15,7 +15,7 @@ Y2K heralded more than date-format hysteria, it was the dawn of web-based applic
 
 <!--more-->
 
-If you read my blog <sub><sup>(I'm not sure I even _have_ any readers...)</sup></sub> for technical content, you can probably skip this one. It's an opinion piece about an enterprise development issue that has bothered me for many years.
+If you read my blog for technical content, you can probably skip this one. It's an opinion piece about an enterprise development issue that has bothered me for many years.
 
 Before I begin, I am certainly not arguing that the Internet or the web is somehow bad. I'm not even arguing that web-based apps are bad: anyone old enough to remember the pain of finding and buying plane tickets before the days of Expedia or Kayak will understand that. I used the Internet in the early 90s through a dial-up modem connection to a shell account provided by a FIDOnet BBS. I had a very expensive CompuServ dial-up account for Usenet access, and I spent years reading email with pine. I used the earliest Yahoo plain-text list of links from a genuine Mosaic browser. The Internet and I go way back.
 
