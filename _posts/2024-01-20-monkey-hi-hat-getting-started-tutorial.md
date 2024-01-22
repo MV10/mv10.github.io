@@ -15,7 +15,7 @@ Installing the program and writing a visualization shader.
 
 <!--more-->
 
-Back in August of 2023, I published [Introducing the Monkey Hi Hat Music Visualizer]({{ site.baseurl }}{% post_url 2023-08-26-introducing-monkey-hi-hat-music-visualizer %}) followed by several mostly-technical articles about the program and the underlying library. Version 2 added multi-pass rendering (described in [this]({{ site.baseurl }}{% post_url 2023-09-09-monkey-hi-hat-multi-pass-rendering %}) article), and version 3 had no article, but it involved a vast number of changes (which you can see in the [wiki changelog](https://github.com/MV10/monkey-hi-hat/wiki/12.-Changelog#v300-2023-10-20)). The most obvious v3 improvement was the addition of post-processing effects. I have a lot of great new features and capabilities that intend to release soon as version 4.
+Back in August of 2023, I published [Introducing the Monkey Hi Hat Music Visualizer]({{ site.baseurl }}{% post_url 2023-08-26-introducing-monkey-hi-hat-music-visualizer %}) followed by several mostly-technical articles about the program and the underlying library. Version 2 added multi-pass rendering (described in [this]({{ site.baseurl }}{% post_url 2023-09-09-monkey-hi-hat-multi-pass-rendering %}) article), and version 3 had no article, but it involved a vast number of changes (which you can see in the [wiki changelog](https://github.com/MV10/monkey-hi-hat/wiki/12.-Changelog#v300-2023-10-20)). The most obvious version 3 improvement was the addition of post-processing effects. I have a lot of great new features and capabilities that I plan to release soon as version 4.
 
 As I write this, the currently available version of Monkey Hi Hat (MHH) is 3.1.0, which you can find on the repository's [release](https://github.com/MV10/monkey-hi-hat/releases/tag/3.1.0) page.
 
@@ -25,7 +25,7 @@ Note that the program still isn't supported for Linux yet, but that _is_ coming 
 
 ## Installation
 
-In the _Assets_ section of the repository's [release](https://github.com/MV10/monkey-hi-hat/releases/tag/3.1.0) page, you'll see a link to `installer.ps1`:
+In the _Assets_ section of the repository's [release](https://github.com/MV10/monkey-hi-hat/releases/tag/3.1.0) page, you'll see a link to `install.ps1`:
 
 ![release_assets](/assets/2024/01-20/release_assets.jpg)
 
@@ -35,7 +35,7 @@ In theory, you should be able to right-click the file and choose _Run with Power
 
 ![context_menu](/assets/2024/01-20/context_menu.jpg)
 
-Unfortunately, by default Microsoft _blocks_ PowerShell script execution. I could go on a long rant about this (why not prompt, like UAC does? why offer a _Run_ context menu option that doesn't work?), but the fix is pretty easy:
+Unfortunately, by default Microsoft _blocks_ PowerShell script execution. If you choose this option, Windows will load the script into an editor. I could go on a long rant about this (why not prompt, like UAC does? why offer a _Run_ context menu option that doesn't work?), but the fix is pretty easy:
 
 > * Open your Start menu and type `Powershell` to launch the scripting console
 > * Run this command: `Set-ExecutionPolicy Unrestricted -Scope CurrentUser`
@@ -62,7 +62,7 @@ At a minimum, change that to `false` so that you can interactively work with the
 
 The `HideMousePointer` setting is `true` by default, but it's kind of annoying in windowed mode, so you may want to change that to `false`.
 
-MHH can cache visualizations and effects as it runs, but if you're actively working on them, it's better to disable caching. You can do this from the command-line, but if you don't want to have to remember to do this (or if you're working on new content very frequently, as I do), it's easier to disable caching. Set the `ShaderCacheSize`, `FXCacheSize`, and `LibraryCacheSize` options to `0` to disable caching. Assuming your files are stored locally and you have a reasonably modern system, you probably won't even notice the difference (caching makes a big difference if the files are stored on another computer or other network-based storage).
+MHH can cache visualizations and effects as it runs, but if you're actively working on them, it's better to disable caching. You can do this from the command-line with the `--nocache` switch, but if you don't want to have to remember to do this every time (or if you're working on new content very frequently, as I do), it's easier to permanently disable caching. Set the `ShaderCacheSize`, `FXCacheSize`, and `LibraryCacheSize` options to `0` to disable caching. Assuming your files are stored locally and you have a reasonably modern system, you probably won't even notice the difference (caching makes a big difference if the files are stored on another computer or other network-based storage).
 
 Finally, at the end of the file you will find a `[windows]` section, and at the end of that section are a bunch of directory-name entries created by the installer. As the names suggest, these tell the program where to find the content shown by the application:
 
@@ -174,7 +174,7 @@ The next two lines define inputs and outputs. The `vec2` and `vec4` data types a
 
 The `void main()` section is the program entry point. You can define functions and variables outside of this, but they generally must be declared above the `main()` function, otherwise most driver's compilers will refuse to compile the shader programs. (These source code text files are read into memory and passed to the graphics driver in real time, as the program runs. Shaders are normally not pre-compiled since every vendor's drivers handle compilation differently, so you can't know ahead of time what your users will have installed.)
 
-The OpenGL coordinate system is _normalized_ which just means all values are in the zero-to-one range. Generally speaking, most shader data uses the `float` data type. GPUs are highly optimized for working with fractional floating-point numbers. Thus, the (x,y) coordinates across the whole viewport ranges from (0, 0) to (1, 1). The exact center of the viewport (regardless of resolution or aspect ratio) is always (0.5, 0.5). Coordinate (0, 0) is the bottom left, and (1, 1) is the top right (exactly like the positive quadrant of a Cartesian grid in the geometry lessons you probably learned in school).
+The OpenGL coordinate system is _normalized_ which just means all values are in the zero-to-one range. Generally speaking, most shader data uses the `float` data type. GPUs are highly optimized for working with fractional floating-point numbers. Thus, the (x,y) coordinates across the whole viewport ranges from (0, 0) to (1, 1). The exact center of the viewport (regardless of resolution or aspect ratio) is always (0.5, 0.5). Coordinate (0, 0) is the bottom left, and (1, 1) is the top right (exactly like the positive quadrant of a Cartesian grid in the geometry lessons you probably had in school).
 
 In fact, just about everything is normalized, even color data. The RGB value for pure white is (1,1,1), which raises an important point: the GLSL language is very picky about how you represent numbers. Since vectors like `vec2` and `vec4` store floating-point values, you have to explicitly write your code to use decimal values:
 
@@ -259,7 +259,7 @@ void main()
 }
 ```
 
-In this version, we declare a `uniform` input that is a normalized `float` data type named `randomrun`. The MHH program tries to pass this value (and the other uniforms listed in the wiki) regardless of whether the shader actually uses it. Now each time you load the box visualization, the size of the white box will change. In reality we're working from the center of the viewport, which is halfway to 1.0, so we multiply `randomrange` by half. We also use the _clamp_ function to ensure the result is never less than 0.05 and never more than 0.45, which ensures the box is always visible but never covers the entire viewport.
+In this version, line 5 declares a `uniform` input that is a normalized `float` data type named `randomrun`. The MHH program tries to pass this value (and the other uniforms listed in the wiki) regardless of whether the shader actually uses it. Now each time you load the box visualization, the size of the white box will change. In reality we're working from the center of the viewport, which is halfway to 1.0, so we multiply `randomrange` by half. We also use the _clamp_ function to ensure the result is never less than 0.05 and never more than 0.45, which ensures the box is always visible but never covers the entire viewport.
 
 ## Load an Image File
 
@@ -310,7 +310,7 @@ This is why we can specify `fragCoord` as the second argument, even though `frag
 
 This is why it's called a _sampler_ and we say we are _sampling_ the texture: the GPU is able to very, very quickly "interpolate" the colors -- sort of like resizing the image on the fly, scaling it up _or_ down as needed. In fact, we don't refer to "pixels" when we're sampling a texture this way, we refer to _texels_ so that it's clear we're talking about something other than the original raw image data.
 
-To put it another way, if the viewport is 1920 x 1080, rendering a `fragCoord` of (0.3, 0.3) means we're _outputting_ the color for the pixel at (576, 324), but if we're _sampling_ (0.3, 0.3) from a 1024 x 768 texture, we're getting interpolated texel data for position (307.2, 230.4): not exactly one specific pixel from the source image, but a value that is a mix of the pixels around the requested location.
+To put it another way, if the viewport is 1920 x 1080, rendering a `fragCoord` of (0.3, 0.3) means we're _calculating_ the final displayed color of the pixel at (576, 324), but if we're _sampling_ (0.3, 0.3) from a 1024 x 768 texture, we're _reading_ interpolated texel color data from position (307.2, 230.4): not exactly one specific pixel from the source image, but a value that is a mix of the pixels nearest to the requested location.
 
 ## Aspect Ratio Correction
 
@@ -352,23 +352,23 @@ void main()
 
 When you run this version, no matter what dimensions you make the window, the image will be shown at the correct aspect ratio:
 
-![bag_dog_corrected](/assets/2024/01-20/bag_dog_corrected)
+![bag_dog_corrected](/assets/2024/01-20/bag_dog_corrected.jpg)
 
 Notice that we've declared another input uniform provided by MHH: `resolution` is a `vec2` that represents the (x,y) size of the viewport.
 
-The `textureSize` command accepts two arguments -- the sampler uniform, and the _level of detail_ or LOD index. We aren't using LOD (it's mostlust useful in 3D applications), so we simply set that to zero to use the original image. Notice that we don't directly use the return value from `textureSize`, but instead we wrap it with a `vec2` constructor. This is because we want floating point (x,y) values, but `textureSize` returns integers using the `ivec2` data type.
+The `textureSize` command accepts two arguments -- the sampler uniform, and the _level of detail_ or LOD index. We aren't using LOD (it's more useful in 3D applications), so we simply set that to zero to use the original image (MHH doesn't configure the textures to generate LOD, so they aren't available even if you wanted to use them). Notice that we don't directly use the return value from `textureSize`, but instead we wrap it with a `vec2` constructor. This is because we want floating point (x,y) values, but `textureSize` returns integers using the `ivec2` data type.
 
-Next, we create a pair of scaling factors. Notice that `scaling` is a `vec2` meaning it has `scaling.x` and `scaling.y` parameters. It is set to the viewport resolution divided by the texture resolution. GLSL allows us to perform mathematical operations like division on variables of the same type without having to reference each individual component. This is equivalent to separately writing:
+Next, we create a pair of scaling factors. Notice that `scaling` is a `vec2` meaning it has `scaling.x` and `scaling.y` parameters. It is set to the viewport resolution divided by the texture resolution. GLSL allows us to perform mathematical operations on variables of the same type without having to reference each individual component. This is equivalent to separately writing:
 
 ```glsl
-    vec2 scaling;
-    scaling.x = resolution.x / texRes.x;
-    scaling.y = resolution.y / texRes.y;
+vec2 scaling;
+scaling.x = resolution.x / texRes.x;
+scaling.y = resolution.y / texRes.y;
 ```
 
 We'll get back to the scaling factor in a moment.
 
-We use the same feature to multiply two other `vec2` values: the `fragCoord` value, which is the normalized 0.0 to 1.0 (x,y) coordinates of the pixel to render, by the viewport resolution, which is the true pixel size of the rendering window's drawing surface. The result is stored in the `vec2` variable named `uv`. This result the _denormalized_ (x,y) coordinate -- the actual discrete pixel x and y values. In other words, if the resolution is 800 x 600, and `fragCoord` is (0.5, 0.5), that yields the pixel coordinate (400, 300) at the center of the screen. Why _uv_? This is another convention in the graphics programming world. The variables "uv" are understood to (usually) hold some alternate representation of (x,y) coordinates. To confuse matters, in some places like Shadertoy, both `fragCoord` and `uv` generally mean the _opposite_ of what they mean in pure OpenGL: the Shadertoy `fragCoord` input is a denormalized pixel coordinate, and `uv` is commonly assigned to the normalized equivalent. For now, the important point is to remember that when you see `uv` you're probably looking at some sort of coordinate data.
+We use the same feature to multiply two other `vec2` values: the `fragCoord` value, which is the normalized 0.0 to 1.0 (x,y) coordinates of the pixel to render, by the viewport resolution, which is the true pixel size of the rendering window's drawing surface. The result is stored in the `vec2` variable named `uv`. This result the _denormalized_ (x,y) coordinate -- the actual discrete pixel x and y values. In other words, if the resolution is 800 x 600, and `fragCoord` is (0.5, 0.5), that yields the pixel coordinate (400, 300) at the center of the screen. Why _uv_? This is another convention in the graphics programming world. Any variable named "uv" is understood to (usually) hold some alternate representation of (x,y) coordinates. To confuse matters, in some systems like Shadertoy, both `fragCoord` and `uv` generally mean the _opposite_ of what they mean in pure OpenGL: the Shadertoy `fragCoord` input is a denormalized pixel coordinate, and `uv` is commonly assigned to the normalized equivalent. For now, the important point is to remember that when you see `uv` you're probably looking at some sort of coordinate data.
 
 Next is a calculation which basically offsets the center of the image from the center of the screen. You might wish to draw this out on a scrap of paper to understand how and why it works. (It should go without saying that the GLSL _max_ command simply returns the larger of two values.)
 
@@ -512,7 +512,7 @@ void main()
 
 By now, you should be able to recognize most of this. We're declaring another MHH-provided uniform called `time` which is the number of seconds elapsed since the shader started running. (In this case, that refers to the FX shader only; the visualizer has a separate `time` uniform that is only available to that program.)
 
-Since this code is based on something from Shadertoy, the "backwards" interpretation of `fragCoord`, so we add a `#define` macro -- anywhere the program refers to `fragCoord`, the calculation `(fragCoord * resolution)` is applied, which gives us the Shadertoy-style denormalized interpretation of `fragCoord`. Ironically, this is often to support a `uv` calculation which turns right around and normalizes that value. But such tricks do make porting easier, and most compilers will optimize that anyway, so it isn't worth worrying about too much.
+Since this code is based on something from Shadertoy, it assumes the "backwards" interpretation of `fragCoord`, so we add a `#define` macro in line 14. Anywhere the program refers to `fragCoord`, the calculation `(fragCoord * resolution)` is applied, which gives us the Shadertoy-style denormalized interpretation of `fragCoord`. Ironically, this is often to support a `uv` calculation which turns right around and normalizes that value. But such tricks do make porting easier, and most compilers will optimize that anyway, so it isn't worth worrying about too much.
 
 You can load a visualizer plus a specific FX with one command:
 
@@ -571,7 +571,7 @@ displacement_amount = 0.01 : 0.10
 
 Now when you run the visualizer and the FX, everything is randomized. The FX config randomizes `time_frequency`, but the visualizer config randomizes `spiral_frequency` and `displacement_amount`.
 
-Note that if a uniform is defined in _both_ config files, the visualizer will take precedence. This is interesting because an FX can provide some randomized values for visualizers which are "unaware" of the FX, but visualizers with special needs (or that have problems with certain FX values) can override those settings. This also allows FX to expose "controls" to the visualizers. For example, the first pass shader in Volt's Laboratory FX [meltdown](https://github.com/MV10/volts-laboratory/blob/master/fx/meltdown1.frag) exposes an `option_mode` uniform that lets a visualizer configure one of four color-matching modes.
+Note that if a uniform is defined in _both_ config files, the visualizer will take precedence. This is interesting because an FX can provide some randomized values for visualizers which are "unaware" of the FX, but visualizers with special needs (or that have problems with certain FX values) can override those settings. This also allows FX to expose "controls" to the visualizers. For example, the first pass shader in Volt's Laboratory FX [meltdown](https://github.com/MV10/volts-laboratory/blob/master/fx/meltdown1.frag) exposes an `option_mode` uniform that lets a visualizer configure one of four color-matching calculations.
 
 ## Conclusion
 
