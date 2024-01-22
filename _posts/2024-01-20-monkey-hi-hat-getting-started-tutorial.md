@@ -137,7 +137,7 @@ Finally, you will probably want a text editor that understads the GLSL shader la
 
 ## Draw a Box
 
-We'll start with an extremely trivial example that just draws a red box on the screen. The `.conf` file describes the visualization to Monkey Hi Hat. Use your editor to create a text file called `box.conf` in your custom `shaders` directory (ie. `C:\MyViz\shaders\box.conf`). Copy this to the file and save it:
+We'll start with an extremely trivial example that just draws a white box on the screen. The `.conf` file describes the visualization to Monkey Hi Hat. Use your editor to create a text file called `box.conf` in your custom `shaders` directory (ie. `C:\MyViz\shaders\box.conf`). Copy this to the file and save it:
 
 ```ini
 [shader]
@@ -358,7 +358,7 @@ Notice that we've declared another input uniform provided by MHH: `resolution` i
 
 The `textureSize` command accepts two arguments -- the sampler uniform, and the _level of detail_ or LOD index. We aren't using LOD (it's more useful in 3D applications), so we simply set that to zero to use the original image (MHH doesn't configure the textures to generate LOD, so they aren't available even if you wanted to use them). Notice that we don't directly use the return value from `textureSize`, but instead we wrap it with a `vec2` constructor. This is because we want floating point (x,y) values, but `textureSize` returns integers using the `ivec2` data type.
 
-Next, we create a pair of scaling factors. Notice that `scaling` is a `vec2` meaning it has `scaling.x` and `scaling.y` parameters. It is set to the viewport resolution divided by the texture resolution. GLSL allows us to perform mathematical operations on variables of the same type without having to reference each individual component. This is equivalent to separately writing:
+Next, we create a pair of scaling factors. Notice that `scaling` is a `vec2` meaning it provides `scaling.x` and `scaling.y` elements. It is set to the viewport resolution divided by the texture resolution. GLSL allows us to perform mathematical operations on variables of the same type without having to reference each individual component. This is equivalent to separately writing:
 
 ```glsl
 vec2 scaling;
@@ -378,7 +378,7 @@ The picture of my dog happens to have a resolution of 495 x 529. These odd dimen
 
 So the next line uses the same vector math support to multiply the original texture resolution by the smallest viewport scaling factor, and the phyiscal coordinates offset from the center are divided by this value, which turns _uv_ back into normalized (0.0 to 1.0) coordinates, which will be required by the `texture` sampling command.
 
-Finally, a _ternary_ assignment is used to either output the sampled texel at the `uv` coordinate, or a black pixel (RGBA all set to zero). A ternary assignment is shorthand for an if/else conditional statement block. The syntax is `variable = (conditional) ? true_value : false_value` and the long form would be written this way:
+Finally, a _ternary assignment_ is used to either output the sampled texel at the `uv` coordinate, or a black pixel (RGBA all set to zero). A ternary assignment is shorthand for an if/else conditional statement block. The syntax is `variable = (conditional) ? true_value : false_value` and the long form would be written this way:
 
 ```glsl
 if(uv == fract(uv))
@@ -571,7 +571,7 @@ displacement_amount = 0.01 : 0.10
 
 Now when you run the visualizer and the FX, everything is randomized. The FX config randomizes `time_frequency`, but the visualizer config randomizes `spiral_frequency` and `displacement_amount`.
 
-Note that if a uniform is defined in _both_ config files, the visualizer will take precedence. This is interesting because an FX can provide some randomized values for visualizers which are "unaware" of the FX, but visualizers with special needs (or that have problems with certain FX values) can override those settings. This also allows FX to expose "controls" to the visualizers. For example, the first pass shader in Volt's Laboratory FX [meltdown](https://github.com/MV10/volts-laboratory/blob/master/fx/meltdown1.frag) exposes an `option_mode` uniform that lets a visualizer configure one of four color-matching calculations.
+Note that if a uniform is defined in _both_ config files, the visualizer will take precedence. This is interesting because an FX can provide some randomized values for visualizers which are "unaware" of the FX, but visualizers with special needs (or that have problems with certain FX values) can override those settings. This also allows FX to expose "controls" to the visualizers. For example, the first pass shader in Volt's Laboratory FX [meltdown](https://github.com/MV10/volts-laboratory/blob/master/fx/meltdown1.frag) exposes an `option_mode` uniform that lets a visualizer "activate" one of four color-matching calculations.
 
 ## Conclusion
 
