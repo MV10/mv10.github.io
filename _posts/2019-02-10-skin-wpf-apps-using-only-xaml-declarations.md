@@ -25,7 +25,7 @@ The source code for this article is available on GitHub in my [WpfSkinExample](h
 
 ## A Good Primer on Skinning
 
-One of the better introductions to WPF skinning I have found is Michael Shpilt's article, [WPF complete guide to Themes and Skins](https://michaelscodingspot.com/2017/06/30/wpf-complete-guide-themes-skins/). I recommend reading it -- there are several ways to tackle skinning, each with pros and cons. I will use a technique very similar to his first example to demonstrate how to skin your app without the kind of hard-coded references seen in his `SkinResourceDictionary` implementation. 
+One of the better introductions to WPF skinning I have found is Michael Shpilt's article, [WPF complete guide to Themes and Skins](https://michaelscodingspot.com/wpf-complete-guide-themes-skins/). I recommend reading it -- there are several ways to tackle skinning, each with pros and cons. I will use a technique very similar to his first example to demonstrate how to skin your app without the kind of hard-coded references seen in his `SkinResourceDictionary` implementation. 
 
 I greatly appreciated Michael's article and the useful observations he makes about the benefits and problems of the different ways to implement skinning, but there were a few things I didn't like about the implementation.
 
