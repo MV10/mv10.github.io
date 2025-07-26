@@ -19,7 +19,7 @@ This is just a quick introductory article for my new music visualization program
 
 This YouTube video is about 3 minutes long and shows short clips of a handful of the available visualizations. (Unfortunately, even though it was uploaded at 720P 60FPS, the YouTube video compression artifacts are pretty terrible. The real thing is very crisp and smooth.) The repository download section provides many, many more visualizations, and of course, you can create your own (and share them in my repo!)
 
-[![sample video](http://img.youtube.com/vi/YTmhQm-1bwU/0.jpg)](https://youtu.be/YTmhQm-1bwU)
+> Update 07-2025: YouTube took down the videos for copyright infringement. 🙄 However, the Monkey Hi Hat repository's README page has some embedded video clips of the same content in the [Sample Videos](https://github.com/MV10/monkey-hi-hat?tab=readme-ov-file#sample-videos) section. Google sucks.
 
 The visualizer runs on Windows 10, Windows 11, and has been tested on a Raspberry Pi 4B using the Debian 11 "Bullseye" variant (32-bit). (Note: Future versions will drop Raspberry Pi support because this requires supporting the ancient OpenGL ES 3.2, which prevents the multi-pass rendering support I intend to add later. The Pi 4B GPU wasn't very good anyway, and of course, the 1.x releases will always be available. Maybe the Pi 5 will have something better.)
 

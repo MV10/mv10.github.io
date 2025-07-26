@@ -19,6 +19,8 @@ I've been writing a series of articles about my new Monkey Hi Hat music visualiz
 
 I have also created a stand-alone example in my [opentk-multipass-demo](https://github.com/MV10/opentk-multipass-demo) repository which, as the name suggests, is primarily "pure" OpenTK (the exception being the conveneince of the `Shader` class from my [eyecandy](https://github.com/MV10/eyecandy) library, since the details of loading and compiling shaders is irrelevant to the technique.) Since that example also lets the user view the results of any stage of processing, I'm using it for some of the screenshots in this article. (Currently Monkey Hi Hat has no such facility, although that is planned, it's handy for visualizer debugging.)
 
+> Edit: Check the [Releases](https://github.com/MV10/monkey-hi-hat/releases) page for the newest version and a fully-automated stand-alone install program.
+
 ## The Leeloo Release
 
 Why an entire article specifically focused on multi-pass rendering? From the Monkey Hi Hat standpoint, apart from just being cool, it's a pretty important new feature: it made visualizer cross-fading rationally possible, and in a future release, it will allow me to add randomized post-processing effects. I hope these effects will eventually make Monkey Hi Hat as interesting and varied as the famous MilkDrop, yet much easier to use -- high aspirations indeed!
